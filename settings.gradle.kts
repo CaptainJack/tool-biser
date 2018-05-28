@@ -1,9 +1,9 @@
 rootProject.name = "biser"
 
 include(
-	"biser-common",
-	"biser-js",
-	"biser-jvm"
+	"kotlin:common",
+	"kotlin:js",
+	"kotlin:jvm"
 )
 
 pluginManagement {
