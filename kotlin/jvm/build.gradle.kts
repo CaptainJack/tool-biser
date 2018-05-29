@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-	expectedBy(project(":biser-common"))
+	expectedBy(project(":biser-kotlin-common"))
 	implementation(kotlin("stdlib-jdk8"))
 	implementation(kotlin("reflect"))
 	testImplementation(kotlin("test-junit"))

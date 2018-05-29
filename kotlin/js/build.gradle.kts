@@ -2,7 +2,6 @@ import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.npm.NpmTask
 import com.moowork.gradle.node.task.NodeTask
 import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	id("kotlin-platform-js")
@@ -11,7 +10,7 @@ plugins {
 }
 
 dependencies {
-	expectedBy(project(":biser-common"))
+	expectedBy(project(":biser-kotlin-common"))
 	implementation(kotlin("stdlib-js"))
 	testImplementation(kotlin("test-js"))
 }
@@ -27,6 +26,7 @@ tasks.withType<Kotlin2JsCompile> {
 configure<NodeExtension> {
 	version = "8.11.1"
 	download = true
+	workDir = buildDir.resolve("nodejs")
 	nodeModulesDir = buildDir.resolve("node_modules")
 	npmWorkDir = buildDir.resolve("npm")
 }
