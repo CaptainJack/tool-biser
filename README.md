@@ -1,3 +1,0 @@
-# Biser
-
-Binary serialization library
