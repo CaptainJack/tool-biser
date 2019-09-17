@@ -1,8 +1,8 @@
-package ru.capjack.biser
+package ru.capjack.tool.io.biser
 
-import ru.capjack.biser.Bytes.x01
-import ru.capjack.biser.Bytes.xFE
-import ru.capjack.biser.Bytes.xFF
+import ru.capjack.tool.io.biser.Bytes.x01
+import ru.capjack.tool.io.biser.Bytes.xFE
+import ru.capjack.tool.io.biser.Bytes.xFF
 import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.readToArray
 import kotlin.reflect.KClass

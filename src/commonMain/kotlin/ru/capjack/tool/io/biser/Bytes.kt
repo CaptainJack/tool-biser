@@ -1,4 +1,4 @@
-package ru.capjack.biser
+package ru.capjack.tool.io.biser
 
 object Bytes {
 	const val x00: Byte = 0x00

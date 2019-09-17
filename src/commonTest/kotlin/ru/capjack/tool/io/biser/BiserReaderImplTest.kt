@@ -1,4 +1,4 @@
-package ru.capjack.biser
+package ru.capjack.tool.io.biser
 
 import ru.capjack.tool.io.ArrayByteBuffer
 import kotlin.test.Test
@@ -82,7 +82,10 @@ class BiserReaderImplTest {
 	
 	@Test
 	fun testReadListList() {
-		testRead(Decoders.ofList(Decoders.ofList(Decoders.INT)), DataPairs.listListInt)
+		testRead(
+			Decoders.ofList(Decoders.ofList(Decoders.INT)),
+			DataPairs.listListInt
+		)
 	}
 	
 	@Test

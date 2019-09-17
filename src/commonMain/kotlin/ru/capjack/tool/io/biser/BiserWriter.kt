@@ -1,4 +1,4 @@
-package ru.capjack.biser
+package ru.capjack.tool.io.biser
 
 interface BiserWriter {
 	fun writeBoolean(value: Boolean)

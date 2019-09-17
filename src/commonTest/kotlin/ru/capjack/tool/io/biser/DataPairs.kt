@@ -1,4 +1,4 @@
-package ru.capjack.biser
+package ru.capjack.tool.io.biser
 
 object DataPairs {
 	val boolean = listOf(

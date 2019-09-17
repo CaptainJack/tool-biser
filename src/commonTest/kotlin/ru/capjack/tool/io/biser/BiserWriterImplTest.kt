@@ -1,4 +1,4 @@
-package ru.capjack.biser
+package ru.capjack.tool.io.biser
 
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.readToArray
