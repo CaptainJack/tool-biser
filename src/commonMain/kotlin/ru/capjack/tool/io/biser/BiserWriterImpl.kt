@@ -1,77 +1,76 @@
 package ru.capjack.tool.io.biser
 
+import ru.capjack.tool.io.OutputByteBuffer
 import ru.capjack.tool.io.biser.Bytes.x00
 import ru.capjack.tool.io.biser.Bytes.x01
 import ru.capjack.tool.io.biser.Bytes.xFE
 import ru.capjack.tool.io.biser.Bytes.xFF
-import ru.capjack.tool.io.DummyOutputByteBuffer
-import ru.capjack.tool.io.OutputByteBuffer
 
 class BiserWriterImpl(
-	var target: OutputByteBuffer = DummyOutputByteBuffer
+	var buffer: OutputByteBuffer
 ) : BiserWriter {
 	
-	private val buffer = ByteArray(9)
+	private val tmp = ByteArray(9)
 	
 	override fun writeBoolean(value: Boolean) {
-		target.writeByte(if (value) x01 else x00)
+		buffer.writeByte(if (value) x01 else x00)
 	}
 	
 	override fun writeByte(value: Byte) {
-		target.writeByte(value)
+		buffer.writeByte(value)
 	}
 	
 	override fun writeShort(value: Short) {
-		buffer[0] = value.asByte(8)
-		buffer[1] = value.toByte()
-		target.writeArray(buffer, size = 2)
+		tmp[0] = value.asByte(8)
+		tmp[1] = value.toByte()
+		buffer.writeArray(tmp, size = 2)
 	}
 	
 	override fun writeInt(value: Int) {
 		when (value) {
-			in 0..253 -> target.writeByte(value.toByte())
-			-1        -> target.writeByte(xFF)
+			in 0..253 -> buffer.writeByte(value.toByte())
+			-1        -> buffer.writeByte(xFF)
 			else      -> {
-				buffer[0] = xFE
-				buffer[1] = value.asByte(24)
-				buffer[2] = value.asByte(16)
-				buffer[3] = value.asByte(8)
-				buffer[4] = value.toByte()
-				target.writeArray(buffer, size = 5)
+				tmp[0] = xFE
+				tmp[1] = value.asByte(24)
+				tmp[2] = value.asByte(16)
+				tmp[3] = value.asByte(8)
+				tmp[4] = value.toByte()
+				buffer.writeArray(tmp, size = 5)
 			}
 		}
 	}
 	
 	override fun writeLong(value: Long) {
 		when (value) {
-			in 0..253 -> target.writeByte(value.toByte())
-			-1L       -> target.writeByte(xFF)
+			in 0..253 -> buffer.writeByte(value.toByte())
+			-1L       -> buffer.writeByte(xFF)
 			else      -> {
-				buffer[0] = xFE
-				buffer[1] = value.asByte(56)
-				buffer[2] = value.asByte(48)
-				buffer[3] = value.asByte(40)
-				buffer[4] = value.asByte(32)
-				buffer[5] = value.asByte(24)
-				buffer[6] = value.asByte(16)
-				buffer[7] = value.asByte(8)
-				buffer[8] = value.toByte()
-				target.writeArray(buffer, size = 9)
+				tmp[0] = xFE
+				tmp[1] = value.asByte(56)
+				tmp[2] = value.asByte(48)
+				tmp[3] = value.asByte(40)
+				tmp[4] = value.asByte(32)
+				tmp[5] = value.asByte(24)
+				tmp[6] = value.asByte(16)
+				tmp[7] = value.asByte(8)
+				tmp[8] = value.toByte()
+				buffer.writeArray(tmp, size = 9)
 			}
 		}
 	}
 	
 	override fun writeDouble(value: Double) {
 		val l = value.toRawBits()
-		buffer[0] = l.asByte(56)
-		buffer[1] = l.asByte(48)
-		buffer[2] = l.asByte(40)
-		buffer[3] = l.asByte(32)
-		buffer[4] = l.asByte(24)
-		buffer[5] = l.asByte(16)
-		buffer[6] = l.asByte(8)
-		buffer[7] = l.toByte()
-		target.writeArray(buffer, size = 8)
+		tmp[0] = l.asByte(56)
+		tmp[1] = l.asByte(48)
+		tmp[2] = l.asByte(40)
+		tmp[3] = l.asByte(32)
+		tmp[4] = l.asByte(24)
+		tmp[5] = l.asByte(16)
+		tmp[6] = l.asByte(8)
+		tmp[7] = l.toByte()
+		buffer.writeArray(tmp, size = 8)
 	}
 	
 	override fun writeBooleanArray(value: BooleanArray) {
@@ -102,13 +101,13 @@ class BiserWriterImpl(
 				bytes[s] = byte.toByte()
 			}
 			
-			target.writeArray(bytes)
+			buffer.writeArray(bytes)
 		}
 	}
 	
 	override fun writeByteArray(value: ByteArray) {
 		writeInt(value.size)
-		target.writeArray(value)
+		buffer.writeArray(value)
 	}
 	
 	override fun writeShortArray(value: ShortArray) {
@@ -125,18 +124,18 @@ class BiserWriterImpl(
 				buffer[b + 1] = v.toByte()
 				b += 2
 			}
-			target.writeArray(buffer)
+			this.buffer.writeArray(buffer)
 		}
 	}
 	
 	override fun writeIntArray(value: IntArray) {
-		target.ensureWrite(1 + value.size)
+		buffer.ensureWrite(1 + value.size)
 		writeInt(value.size)
 		value.forEach(::writeInt)
 	}
 	
 	override fun writeLongArray(value: LongArray) {
-		target.ensureWrite(1 + value.size)
+		buffer.ensureWrite(1 + value.size)
 		writeInt(value.size)
 		value.forEach(::writeLong)
 	}
@@ -161,7 +160,7 @@ class BiserWriterImpl(
 				buffer[b + 7] = v.toByte()
 				b += 8
 			}
-			target.writeArray(buffer)
+			this.buffer.writeArray(buffer)
 		}
 	}
 	

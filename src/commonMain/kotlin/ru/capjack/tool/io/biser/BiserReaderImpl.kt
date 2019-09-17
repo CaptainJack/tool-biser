@@ -1,39 +1,40 @@
 package ru.capjack.tool.io.biser
 
+import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.biser.Bytes.x01
 import ru.capjack.tool.io.biser.Bytes.xFE
 import ru.capjack.tool.io.biser.Bytes.xFF
-import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.readToArray
 import kotlin.reflect.KClass
 
 open class BiserReaderImpl(
-	private val target: InputByteBuffer
+	val buffer: InputByteBuffer
 ) : BiserReader {
-	private val buffer = ByteArray(8)
+	
+	private val tmp = ByteArray(8)
 	
 	override fun readBoolean(): Boolean {
 		return readByte() == x01
 	}
 	
 	override fun readByte(): Byte {
-		return target.readByte()
+		return buffer.readByte()
 	}
 	
 	override fun readShort(): Short {
-		readToBuffer(2)
-		return (buffer[0].asInt(8) + buffer[1].asInt()).toShort()
+		readToTmp(2)
+		return (tmp[0].asInt(8) + tmp[1].asInt()).toShort()
 	}
 	
 	override fun readInt(): Int {
 		return when (val b = readByte()) {
 			xFF  -> -1
 			xFE  -> {
-				readToBuffer(4)
-				buffer[0].asInt(24) +
-					buffer[1].asInt(16) +
-					buffer[2].asInt(8) +
-					buffer[3].asInt()
+				readToTmp(4)
+				tmp[0].asInt(24) +
+					tmp[1].asInt(16) +
+					tmp[2].asInt(8) +
+					tmp[3].asInt()
 			}
 			else -> b.asInt()
 		}
@@ -67,7 +68,7 @@ open class BiserReaderImpl(
 	
 	override fun readByteArray(): ByteArray {
 		val size = readInt()
-		return target.readToArray(size)
+		return buffer.readToArray(size)
 	}
 	
 	override fun readShortArray(): ShortArray {
@@ -92,7 +93,7 @@ open class BiserReaderImpl(
 		if (size == -1) {
 			return null
 		}
-		return target.readToArray(size).toUtf8String()
+		return buffer.readToArray(size).toUtf8String()
 	}
 	
 	override fun <E : Enum<E>> readEnum(type: KClass<E>): E {
@@ -110,21 +111,21 @@ open class BiserReaderImpl(
 		return decoder(this)
 	}
 	
-	private fun readToBuffer(size: Int) {
-		target.readArray(buffer, size = size)
+	private fun readToTmp(size: Int) {
+		buffer.readArray(tmp, size = size)
 	}
 	
 	private fun readRawLong(): Long {
-		readToBuffer(8)
+		readToTmp(8)
 		
-		return buffer[0].asLong(56) +
-			buffer[1].asLong(48) +
-			buffer[2].asLong(40) +
-			buffer[3].asLong(32) +
-			buffer[4].asLong(24) +
-			buffer[5].asInt(16) +
-			buffer[6].asInt(8) +
-			buffer[7].asInt()
+		return tmp[0].asLong(56) +
+			tmp[1].asLong(48) +
+			tmp[2].asLong(40) +
+			tmp[3].asLong(32) +
+			tmp[4].asLong(24) +
+			tmp[5].asInt(16) +
+			tmp[6].asInt(8) +
+			tmp[7].asInt()
 	}
 	
 	private fun Byte.asInt(): Int {
