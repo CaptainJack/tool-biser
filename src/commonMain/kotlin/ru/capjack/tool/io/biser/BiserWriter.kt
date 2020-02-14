@@ -1,11 +1,11 @@
 package ru.capjack.tool.io.biser
 
+typealias Encoder<T> = BiserWriter.(T) -> Unit
+
 interface BiserWriter {
 	fun writeBoolean(value: Boolean)
 	
 	fun writeByte(value: Byte)
-	
-	fun writeShort(value: Short)
 	
 	fun writeInt(value: Int)
 	
@@ -18,8 +18,6 @@ interface BiserWriter {
 	
 	fun writeByteArray(value: ByteArray)
 	
-	fun writeShortArray(value: ShortArray)
-	
 	fun writeIntArray(value: IntArray)
 	
 	fun writeLongArray(value: LongArray)
@@ -27,9 +25,7 @@ interface BiserWriter {
 	fun writeDoubleArray(value: DoubleArray)
 	
 	
-	fun writeString(value: String?)
-	
-	fun writeEnum(value: Enum<*>)
+	fun writeString(value: String)
 	
 	fun <E> writeList(value: List<E>, encoder: Encoder<E>)
 	

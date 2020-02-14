@@ -1,13 +1,11 @@
 package ru.capjack.tool.io.biser
 
-import kotlin.reflect.KClass
+typealias Decoder<T> = (BiserReader) -> T
 
 interface BiserReader {
 	fun readBoolean(): Boolean
 	
 	fun readByte(): Byte
-	
-	fun readShort(): Short
 	
 	fun readInt(): Int
 	
@@ -20,8 +18,6 @@ interface BiserReader {
 	
 	fun readByteArray(): ByteArray
 	
-	fun readShortArray(): ShortArray
-	
 	fun readIntArray(): IntArray
 	
 	fun readLongArray(): LongArray
@@ -29,9 +25,7 @@ interface BiserReader {
 	fun readDoubleArray(): DoubleArray
 	
 	
-	fun readString(): String?
-	
-	fun <E : Enum<E>> readEnum(type: KClass<E>): E
+	fun readString(): String
 	
 	fun <E> readList(decoder: Decoder<E>): List<E>
 	

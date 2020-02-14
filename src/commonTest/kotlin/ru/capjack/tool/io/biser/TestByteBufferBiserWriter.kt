@@ -4,7 +4,7 @@ import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.readToArray
 import kotlin.test.Test
 
-class BiserWriterImplTest() {
+class TestByteBufferBiserWriter() {
 	@Test
 	fun testWriteBoolean() {
 		testWrite(Encoders.BOOLEAN, DataPairs.boolean)
@@ -13,11 +13,6 @@ class BiserWriterImplTest() {
 	@Test
 	fun testWriteByte() {
 		testWrite(Encoders.BYTE, DataPairs.byte)
-	}
-	
-	@Test
-	fun testWriteShort() {
-		testWrite(Encoders.SHORT, DataPairs.short)
 	}
 	
 	@Test
@@ -36,13 +31,13 @@ class BiserWriterImplTest() {
 	}
 	
 	@Test
-	fun testWriteByteArray() {
-		testWrite(Encoders.BYTE_ARRAY, DataPairs.byteArray)
+	fun testWriteBooleanArray() {
+		testWrite(Encoders.BOOLEAN_ARRAY, DataPairs.booleanArray)
 	}
 	
 	@Test
-	fun testWriteShortArray() {
-		testWrite(Encoders.SHORT_ARRAY, DataPairs.shortArray)
+	fun testWriteByteArray() {
+		testWrite(Encoders.BYTE_ARRAY, DataPairs.byteArray)
 	}
 	
 	@Test
@@ -63,11 +58,6 @@ class BiserWriterImplTest() {
 	@Test
 	fun testWriteString() {
 		testWrite(Encoders.STRING, DataPairs.string)
-	}
-	
-	@Test
-	fun testWriteEnum() {
-		testWrite(Encoders.ENUM, DataPairs.enum)
 	}
 	
 	@Test
@@ -96,7 +86,7 @@ class BiserWriterImplTest() {
 	
 	private fun <T> testWrite(encoder: Encoder<T>, pairs: List<Pair<T, ByteArray>>) {
 		val buffer = ArrayByteBuffer()
-		val writer = BiserWriterImpl(buffer)
+		val writer = ByteBufferBiserWriter(buffer)
 		
 		for (pair in pairs) {
 			buffer.clear()

@@ -4,7 +4,7 @@ import ru.capjack.tool.io.ArrayByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class BiserReaderImplTest {
+class TestByteBufferBiserReader {
 	@Test
 	fun testReadBoolean() {
 		testRead(Decoders.BOOLEAN, DataPairs.boolean)
@@ -18,11 +18,6 @@ class BiserReaderImplTest {
 	@Test
 	fun testReadInt() {
 		testRead(Decoders.INT, DataPairs.int)
-	}
-	
-	@Test
-	fun testReadShort() {
-		testRead(Decoders.SHORT, DataPairs.short)
 	}
 	
 	@Test
@@ -46,11 +41,6 @@ class BiserReaderImplTest {
 	}
 	
 	@Test
-	fun testReadShortArray() {
-		testRead(Decoders.SHORT_ARRAY, DataPairs.shortArray, ::assertPrimitiveArrayEquals)
-	}
-	
-	@Test
 	fun testReadIntArray() {
 		testRead(Decoders.INT_ARRAY, DataPairs.intArray, ::assertPrimitiveArrayEquals)
 	}
@@ -68,11 +58,6 @@ class BiserReaderImplTest {
 	@Test
 	fun testReadString() {
 		testRead(Decoders.STRING, DataPairs.string)
-	}
-	
-	@Test
-	fun testReadEnum() {
-		testRead(Decoders.ofEnum(), DataPairs.enum)
 	}
 	
 	@Test
@@ -104,7 +89,7 @@ class BiserReaderImplTest {
 	
 	private fun <T> testRead(decoder: Decoder<T>, pairs: List<Pair<T, ByteArray>>, assert: (T, T) -> Unit) {
 		val buffer = ArrayByteBuffer()
-		val reader = BiserReaderImpl(buffer)
+		val reader = ByteBufferBiserReader(buffer)
 		
 		for (pair in pairs) {
 			buffer.clear()

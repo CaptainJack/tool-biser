@@ -1,14 +1,10 @@
 package ru.capjack.tool.io.biser
 
 import ru.capjack.tool.io.InputByteBuffer
-import ru.capjack.tool.io.biser.Bytes.x01
-import ru.capjack.tool.io.biser.Bytes.xFE
-import ru.capjack.tool.io.biser.Bytes.xFF
 import ru.capjack.tool.io.readToArray
-import kotlin.reflect.KClass
 
-open class BiserReaderImpl(
-	val buffer: InputByteBuffer
+class ByteBufferBiserReader(
+	private val buffer: InputByteBuffer
 ) : BiserReader {
 	
 	private val tmp = ByteArray(8)
@@ -21,20 +17,15 @@ open class BiserReaderImpl(
 		return buffer.readByte()
 	}
 	
-	override fun readShort(): Short {
-		readToTmp(2)
-		return (tmp[0].asInt(8) + tmp[1].asInt()).toShort()
-	}
-	
 	override fun readInt(): Int {
 		return when (val b = readByte()) {
 			xFF  -> -1
 			xFE  -> {
 				readToTmp(4)
-				tmp[0].asInt(24) +
-					tmp[1].asInt(16) +
-					tmp[2].asInt(8) +
-					tmp[3].asInt()
+				(tmp[0].asInt() shl 24)
+					.or(tmp[1].asInt() shl 16)
+					.or(tmp[2].asInt() shl 8)
+					.or(tmp[3].asInt())
 			}
 			else -> b.asInt()
 		}
@@ -61,18 +52,14 @@ open class BiserReaderImpl(
 				bit = 0
 				byte = readByte().asInt()
 			}
-			val m = 1.shl(bit)
-			byte.and(m) == m
+			val m = 1 shl bit
+			byte and m == m
 		}
 	}
 	
 	override fun readByteArray(): ByteArray {
 		val size = readInt()
 		return buffer.readToArray(size)
-	}
-	
-	override fun readShortArray(): ShortArray {
-		return ShortArray(readInt()) { readShort() }
 	}
 	
 	override fun readIntArray(): IntArray {
@@ -88,16 +75,12 @@ open class BiserReaderImpl(
 	}
 	
 	
-	override fun readString(): String? {
+	override fun readString(): String {
 		val size = readInt()
-		if (size == -1) {
-			return null
-		}
-		return buffer.readToArray(size).toUtf8String()
-	}
-	
-	override fun <E : Enum<E>> readEnum(type: KClass<E>): E {
-		return type.getEnumValue(readInt())
+		val view = buffer.readableArrayView
+		val value = view.array.decodeToUtf8String(view.readerIndex, size)
+		view.commitRead(size)
+		return value
 	}
 	
 	override fun <E> readList(decoder: Decoder<E>): List<E> {
@@ -118,30 +101,18 @@ open class BiserReaderImpl(
 	private fun readRawLong(): Long {
 		readToTmp(8)
 		
-		return tmp[0].asLong(56) +
-			tmp[1].asLong(48) +
-			tmp[2].asLong(40) +
-			tmp[3].asLong(32) +
-			tmp[4].asLong(24) +
-			tmp[5].asInt(16) +
-			tmp[6].asInt(8) +
-			tmp[7].asInt()
-	}
-	
-	private fun Byte.asInt(): Int {
-		return toInt().and(0xFF)
-	}
-	
-	private fun Byte.asInt(shl: Int): Int {
-		return asInt().shl(shl)
+		return (tmp[0].asLong() shl 56)
+			.or(tmp[1].asLong() shl 48)
+			.or(tmp[2].asLong() shl 40)
+			.or(tmp[3].asLong() shl 32)
+			.or(tmp[4].asLong() shl 24)
+			.or(tmp[5].asLong() shl 16)
+			.or(tmp[6].asLong() shl 8)
+			.or(tmp[7].asLong())
 	}
 	
 	private fun Byte.asLong(): Long {
 		return toLong().and(0xFF)
-	}
-	
-	private fun Byte.asLong(shl: Int): Long {
-		return asLong().shl(shl)
 	}
 }
 
