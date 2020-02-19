@@ -4,7 +4,7 @@ import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.readToArray
 import kotlin.test.Test
 
-class TestByteBufferBiserWriter() {
+class TestByteBufferBiserWriter {
 	@Test
 	fun testWriteBoolean() {
 		testWrite(Encoders.BOOLEAN, DataPairs.boolean)

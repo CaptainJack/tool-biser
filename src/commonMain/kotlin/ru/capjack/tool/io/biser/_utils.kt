@@ -2,13 +2,13 @@
 
 package ru.capjack.tool.io.biser
 
-const val x00: Byte = 0x00
-const val x01: Byte = 0x01
-const val xFE: Byte = 0xFE.toByte()
-const val xFF: Byte = 0xFF.toByte()
+const val x00 = 0x00.toByte()
+const val x01 = 0x01.toByte()
+const val xFE = 0xFE.toByte()
+const val xFF = 0xFF.toByte()
 
-internal fun Byte.asInt(): Int {
-	return toInt().and(0xFF)
+internal fun i(byte: Byte): Int {
+	return byte.toInt().and(0xFF)
 }
 
 internal inline operator fun ByteArray.set(index: Int, value: Int) {

@@ -12,16 +12,6 @@ fun assertPrimitiveArrayEquals(expected: BooleanArray, actual: BooleanArray) {
 }
 
 fun assertPrimitiveArrayEquals(expected: ByteArray, actual: ByteArray) {
-	try {
-		assertEquals(expected.size, actual.size, "Size")
-		assertEquals(expected.joinToString { it.hex() }, actual.joinToString { it.hex() })
-	}
-	catch (e: Throwable) {
-		throw e
-	}
-}
-
-fun assertPrimitiveArrayEquals(expected: ShortArray, actual: ShortArray) {
 	assertEquals(expected.size, actual.size, "Size")
 	assertEquals(expected.joinToString { it.hex() }, actual.joinToString { it.hex() })
 }

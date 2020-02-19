@@ -17,11 +17,50 @@ class ByteBufferBiserWriter(
 		buffer.writeByte(value)
 	}
 	
+	@Suppress("ConvertTwoComparisonsToRangeCheck", "CascadeIf")
 	override fun writeInt(value: Int) {
-		when (value) {
-			in 0..253 -> buffer.writeByte(value.toByte())
-			-1        -> buffer.writeByte(xFF)
-			else      -> {
+		if (value >= 0) {
+			if (value < 128) {
+				buffer.writeByte(value.toByte())
+			}
+			else if (value < 16512) {
+				val v = value - 128
+				tmp[0] = v ushr 8 or 0x80
+				tmp[1] = v
+				buffer.writeArray(tmp, 0, 2)
+			}
+			else if (value < 2113664) {
+				val v = value - 16512
+				tmp[0] = v ushr 16 or 0xC0
+				tmp[1] = v ushr 8
+				tmp[2] = v
+				buffer.writeArray(tmp, 0, 3)
+			}
+			else if (value < 270549120) {
+				val v = value - 2113664
+				tmp[0] = v ushr 24 or 0xE0
+				tmp[1] = v ushr 16
+				tmp[2] = v ushr 8
+				tmp[3] = v
+				buffer.writeArray(tmp, 0, 4)
+			}
+			else if (value < 404766848) {
+				val v = value - 270549120
+				tmp[0] = v ushr 24 or 0xF0
+				tmp[1] = v ushr 16
+				tmp[2] = v ushr 8
+				tmp[3] = v
+				buffer.writeArray(tmp, 0, 4)
+			}
+			else if (value < 471875712) {
+				val v = value - 404766848
+				tmp[0] = v ushr 24 or 0xF8
+				tmp[1] = v ushr 16
+				tmp[2] = v ushr 8
+				tmp[3] = v
+				buffer.writeArray(tmp, 0, 4)
+			}
+			else {
 				tmp[0] = xFE
 				tmp[1] = value ushr 24
 				tmp[2] = value ushr 16
@@ -30,24 +69,43 @@ class ByteBufferBiserWriter(
 				buffer.writeArray(tmp, 0, 5)
 			}
 		}
+		else if (value == -1) {
+			buffer.writeByte(xFF)
+		}
+		else if (value >= -33554433) {
+			val v = (value + 1).and(0x1FFFFFF)
+			tmp[0] = v ushr 24 or 0xFC
+			tmp[1] = v ushr 16
+			tmp[2] = v ushr 8
+			tmp[3] = v
+			buffer.writeArray(tmp, 0, 4)
+		}
+		else {
+			tmp[0] = xFE
+			tmp[1] = value ushr 24
+			tmp[2] = value ushr 16
+			tmp[3] = value ushr 8
+			tmp[4] = value
+			buffer.writeArray(tmp, 0, 5)
+		}
 	}
 	
+	
 	override fun writeLong(value: Long) {
-		when (value) {
-			in 0..253 -> buffer.writeByte(value.toByte())
-			-1L       -> buffer.writeByte(xFF)
-			else      -> {
-				tmp[0] = xFE
-				tmp[1] = value ushr 56
-				tmp[2] = value ushr 48
-				tmp[3] = value ushr 40
-				tmp[4] = value ushr 32
-				tmp[5] = value ushr 24
-				tmp[6] = value ushr 16
-				tmp[7] = value ushr 8
-				tmp[8] = value
-				buffer.writeArray(tmp, 0, 9)
-			}
+		if (value >= -33554433 && value < 471875712) {
+			writeInt(value.toInt())
+		}
+		else {
+			tmp[0] = xFE
+			tmp[1] = value ushr 56
+			tmp[2] = value ushr 48
+			tmp[3] = value ushr 40
+			tmp[4] = value ushr 32
+			tmp[5] = value ushr 24
+			tmp[6] = value ushr 16
+			tmp[7] = value ushr 8
+			tmp[8] = value
+			buffer.writeArray(tmp, 0, 9)
 		}
 	}
 	
@@ -77,8 +135,9 @@ class ByteBufferBiserWriter(
 			var byte = 0
 			var bit = 0
 			s = 0
-			value.forEach {
-				if (it) {
+			
+			for (v in value) {
+				if (v) {
 					byte = byte or (1 shl bit)
 				}
 				if (++bit == 8) {

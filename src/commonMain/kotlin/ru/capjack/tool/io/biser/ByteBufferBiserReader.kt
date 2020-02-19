@@ -18,24 +18,77 @@ class ByteBufferBiserReader(
 	}
 	
 	override fun readInt(): Int {
-		return when (val b = readByte()) {
-			xFF  -> -1
-			xFE  -> {
-				readToTmp(4)
-				(tmp[0].asInt() shl 24)
-					.or(tmp[1].asInt() shl 16)
-					.or(tmp[2].asInt() shl 8)
-					.or(tmp[3].asInt())
+		val b = i(buffer.readByte())
+		
+		when {
+			b and 0x80 == 0x00 ->
+				return b
+			b == 0xFF          ->
+				return -1
+			b and 0xC0 == 0x80 ->
+				return ((b and 0x3F).shl(8) or i(buffer.readByte())) + 128
+			b and 0xE0 == 0xC0 -> {
+				readToTmp(2)
+				return ((b and 0x1F).shl(16) or i(tmp[0]).shl(8) or i(tmp[1])) + 16512
 			}
-			else -> b.asInt()
+			b and 0xF0 == 0xE0 -> {
+				readToTmp(3)
+				return ((b and 0x0F).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) + 2113664
+			}
+			b and 0xF8 == 0xF0 -> {
+				readToTmp(3)
+				return ((b and 0x07).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) + 270549120
+			}
+			b and 0xFC == 0xF8 -> {
+				readToTmp(3)
+				return ((b and 0x03).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) + 404766848
+			}
+			b and 0xFE == 0xFC -> {
+				readToTmp(3)
+				return ((b and 0x01 or 0xFE).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) - 1
+			}
+			else               -> {
+				readToTmp(4)
+				return (i(tmp[0]) shl 24)
+					.or(i(tmp[1]) shl 16)
+					.or(i(tmp[2]) shl 8)
+					.or(i(tmp[3]))
+			}
 		}
 	}
 	
 	override fun readLong(): Long {
-		return when (val b = readByte()) {
-			xFF  -> -1
-			xFE  -> readRawLong()
-			else -> b.asLong()
+		val b = i(buffer.readByte())
+		
+		when {
+			b and 0x80 == 0x00 ->
+				return b.toLong()
+			b == 0xFF          ->
+				return -1
+			b and 0xC0 == 0x80 ->
+				return (((b and 0x3F).shl(8) or i(buffer.readByte())) + 128).toLong()
+			b and 0xE0 == 0xC0 -> {
+				readToTmp(2)
+				return (((b and 0x1F).shl(16) or i(tmp[0]).shl(8) or i(tmp[1])) + 16512).toLong()
+			}
+			b and 0xF0 == 0xE0 -> {
+				readToTmp(3)
+				return (((b and 0x0F).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) + 2113664).toLong()
+			}
+			b and 0xF8 == 0xF0 -> {
+				readToTmp(3)
+				return (((b and 0x07).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) + 270549120).toLong()
+			}
+			b and 0xFC == 0xF8 -> {
+				readToTmp(3)
+				return (((b and 0x03).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) + 404766848).toLong()
+			}
+			b and 0xFE == 0xFC -> {
+				readToTmp(3)
+				return (((b and 0x01 or 0xFE).shl(24) or i(tmp[0]).shl(16) or i(tmp[1]).shl(8) or i(tmp[2])) - 1).toLong()
+			}
+			else               ->
+				return readRawLong()
 		}
 	}
 	
@@ -50,7 +103,7 @@ class ByteBufferBiserReader(
 		return BooleanArray(readInt()) {
 			if (++bit == 8) {
 				bit = 0
-				byte = readByte().asInt()
+				byte = i(readByte())
 			}
 			val m = 1 shl bit
 			byte and m == m
@@ -95,7 +148,7 @@ class ByteBufferBiserReader(
 	}
 	
 	private fun readToTmp(size: Int) {
-		buffer.readArray(tmp, size = size)
+		buffer.readArray(tmp, 0, size)
 	}
 	
 	private fun readRawLong(): Long {
