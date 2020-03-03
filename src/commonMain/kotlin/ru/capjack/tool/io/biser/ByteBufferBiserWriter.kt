@@ -4,7 +4,7 @@ import ru.capjack.tool.io.OutputByteBuffer
 import ru.capjack.tool.io.ensureWriteableArrayView
 
 class ByteBufferBiserWriter(
-	private val buffer: OutputByteBuffer
+	var buffer: OutputByteBuffer
 ) : BiserWriter {
 	
 	private val tmp = ByteArray(9)

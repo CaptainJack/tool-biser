@@ -4,7 +4,7 @@ import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.readToArray
 
 class ByteBufferBiserReader(
-	private val buffer: InputByteBuffer
+	var buffer: InputByteBuffer
 ) : BiserReader {
 	
 	private val tmp = ByteArray(8)
