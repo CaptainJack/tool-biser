@@ -1,6 +1,5 @@
 package ru.capjack.tool.io.biser
 
-
 object Encoders {
 	val BOOLEAN: Encoder<Boolean> = BiserWriter::writeBoolean
 	val BYTE: Encoder<Byte> = BiserWriter::writeByte
@@ -16,5 +15,5 @@ object Encoders {
 	
 	val STRING: Encoder<String> = BiserWriter::writeString
 	
-	fun <E> ofList(encoder: Encoder<E>): Encoder<List<E>> = { value -> writeList(value, encoder) }
+	fun <E> ofList(encoder: Encoder<E>): Encoder<List<E>> = { writeList(it, encoder) }
 }

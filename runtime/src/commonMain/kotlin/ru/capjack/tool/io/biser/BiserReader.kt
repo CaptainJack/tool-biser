@@ -1,6 +1,6 @@
 package ru.capjack.tool.io.biser
 
-typealias Decoder<T> = (BiserReader) -> T
+typealias Decoder<T> = BiserReader.() -> T
 
 interface BiserReader {
 	fun readBoolean(): Boolean

@@ -13,7 +13,7 @@ object Decoders {
 	val LONG_ARRAY: Decoder<LongArray> = BiserReader::readLongArray
 	val DOUBLE_ARRAY: Decoder<DoubleArray> = BiserReader::readDoubleArray
 	
-	val STRING: Decoder<String?> = BiserReader::readString
+	val STRING: Decoder<String> = BiserReader::readString
 	
-	fun <T> ofList(decoder: Decoder<T>): Decoder<List<T>> = { it.readList(decoder) }
+	fun <T> ofList(decoder: Decoder<T>): Decoder<List<T>> = { readList(decoder) }
 }
