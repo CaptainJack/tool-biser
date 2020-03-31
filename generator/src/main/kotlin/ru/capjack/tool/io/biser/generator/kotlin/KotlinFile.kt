@@ -2,24 +2,30 @@ package ru.capjack.tool.io.biser.generator.kotlin
 
 import ru.capjack.tool.io.biser.generator.CodeBlock
 import ru.capjack.tool.io.biser.generator.CodeFile
+import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.ImportsCollection
 import java.io.Writer
+import java.nio.file.Path
 
-class KotlinFile(private val pack: String) : CodeFile(),
-	ImportsCollection {
-	private val packagePrefix = "$pack."
-	
-	private val imports = mutableSetOf<String>()
+class KotlinFile(private val name: CodePath) : CodeFile(), ImportsCollection {
+	private val imports = mutableSetOf<CodePath>()
 	
 	override fun addImport(name: String) {
-		if (!name.startsWith(packagePrefix)) {
+		addImport(CodePath(name))
+	}
+	
+	override fun addImport(name: CodePath) {
+		if (this.name.parent != name.parent) {
 			imports.add(name)
 		}
 	}
 	
 	override fun write(writer: Writer) {
 		prepend(CodeBlock(0).apply {
-			line("package $pack")
+			val pack = name.parent
+			if (pack!=null) {
+				line("package ${pack.value}")
+			}
 			
 			if (imports.isNotEmpty()) {
 				line()
@@ -30,5 +36,9 @@ class KotlinFile(private val pack: String) : CodeFile(),
 		})
 		
 		super.write(writer)
+	}
+	
+	override fun write(path: Path) {
+		super.write(path.resolve(name.asString('/') + ".kt"))
 	}
 }

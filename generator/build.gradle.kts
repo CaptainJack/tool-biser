@@ -4,14 +4,14 @@ plugins {
 }
 
 kotlin.target {
-	compilations.all { kotlinOptions.jvmTarget = "11" }
+	compilations.all { kotlinOptions.jvmTarget = "1.8" }
 }
 
 dependencies {
 	implementation(kotlin("stdlib-jdk8"))
-	implementation(kotlin("compiler"))
+	implementation(kotlin("compiler-embeddable"))
 	implementation("org.yaml:snakeyaml:1.25")
-	implementation("ru.capjack.tool:tool-logging:1.0.1")
+	implementation("org.slf4j:slf4j-api:1.7.26")
 	
 	testImplementation(kotlin("test-junit"))
 	testImplementation("ch.qos.logback:logback-classic:1.2.3")

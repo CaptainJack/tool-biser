@@ -1,6 +1,8 @@
 package ru.capjack.tool.io.biser.generator.kotlin
 
 import ru.capjack.tool.io.biser.generator.CodeBlock
+import ru.capjack.tool.io.biser.generator.CodePath
+import ru.capjack.tool.io.biser.generator.ImportsCollection
 import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
 import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
 import ru.capjack.tool.io.biser.generator.model.ListType
@@ -14,30 +16,32 @@ import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 class KotlinEncoderGeneratorVisitor(
 	private val writeCalls: TypeVisitor<String, String>,
 	private val encoderNames: TypeVisitor<String, Unit>,
-	private val typeNames: TypeVisitor<String, Unit>,
-	structuresPackage: String
+	private val typeNames: TypeVisitor<String, ImportsCollection>,
+	private val targetPackage: CodePath
 ) : TypeVisitor<Unit, KotlinGeneratorContext>, StructureDescriptorVisitor<Unit, KotlinGeneratorContext> {
 	
-	private val structuresPackagePrefix = "$structuresPackage."
-	
-	private val entityFieldTypesVisitor = object :
-		TypeVisitor<Unit, KotlinGeneratorContext> {
+	private val entityFieldTypesVisitor = object : TypeVisitor<Unit, KotlinGeneratorContext> {
+		private var deep = 0
 		override fun visitPrimitiveType(type: PrimitiveType, data: KotlinGeneratorContext) {
-			data.imports.addImport("ru.capjack.tool.io.biser.Encoders")
+			if (deep != 0) {
+				data.imports.addImport("ru.capjack.tool.io.biser.Encoders")
+			}
 		}
 		
 		override fun visitListType(type: ListType, data: KotlinGeneratorContext) {
 			data.types.add(type.element)
+			++deep
+			type.element.accept(this, data)
+			--deep
 		}
 		
 		override fun visitStructureType(type: StructureType, data: KotlinGeneratorContext) {
-			data.types.add(type)
+			if (deep == 0) data.types.add(type)
 		}
 		
 		override fun visitNullableType(type: NullableType, data: KotlinGeneratorContext) {
-			data.types.add(type)
+			if (deep == 0) data.types.add(type)
 		}
-		
 	}
 	
 	override fun visitPrimitiveType(type: PrimitiveType, data: KotlinGeneratorContext) {
@@ -50,7 +54,7 @@ class KotlinEncoderGeneratorVisitor(
 	}
 	
 	override fun visitStructureType(type: StructureType, data: KotlinGeneratorContext) {
-		data.imports.addImport(structuresPackagePrefix + type.name)
+		data.imports.addImport(targetPackage.resolve(type.path))
 		type.descriptor.accept(this, data)
 	}
 	
@@ -65,7 +69,7 @@ class KotlinEncoderGeneratorVisitor(
 	
 	override fun visitEnumStructureDescriptor(descriptor: EnumDescriptor, data: KotlinGeneratorContext) {
 		val type = descriptor.type
-		val typeName = type.accept(typeNames)
+		val typeName = type.accept(typeNames, data.imports)
 		writeDeclaration(type, data).apply {
 			line("writeInt(when (it) {")
 			ident {
@@ -85,7 +89,7 @@ class KotlinEncoderGeneratorVisitor(
 				
 				identBracketsCurly("when (it) ") {
 					descriptor.children.forEach { child ->
-						identBracketsCurly("is ${child.accept(typeNames)} -> ") {
+						identBracketsCurly("is ${child.accept(typeNames, data.imports)} -> ") {
 							with(child.descriptor as EntityDescriptor) {
 								if (children.isEmpty()) {
 									line("writeInt(${id})")
@@ -126,7 +130,7 @@ class KotlinEncoderGeneratorVisitor(
 		context.imports.addImport("ru.capjack.tool.io.biser.Encoder")
 		
 		val name = type.accept(encoderNames)
-		val typeName = type.accept(typeNames)
+		val typeName = type.accept(typeNames, context.imports)
 		
 		val block = context.code.identBracketsCurly("val $name: Encoder<$typeName> = ")
 		
@@ -134,5 +138,4 @@ class KotlinEncoderGeneratorVisitor(
 		
 		return block
 	}
-	
 }

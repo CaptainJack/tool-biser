@@ -1,8 +1,9 @@
 package ru.capjack.tool.io.biser.generator.model
 
+import ru.capjack.tool.io.biser.generator.CodePath
 import java.util.*
 
-internal class InternalStructureType(override val name: String, descriptor: StructureDescriptor?) : StructureType {
+internal class StructureTypeImpl(override val path: CodePath, descriptor: StructureDescriptor?) : StructureType {
 	override lateinit var descriptor: StructureDescriptor
 	
 	init {
@@ -19,19 +20,19 @@ internal class InternalStructureType(override val name: String, descriptor: Stru
 		if (this === other) return true
 		if (javaClass != other?.javaClass) return false
 		other as StructureType
-		if (name != other.name) return false
+		if (path != other.path) return false
 		return true
 	}
 	
 	override fun hashCode(): Int {
-		return Objects.hash("Structure", name)
+		return Objects.hash("Structure", path)
 	}
 }
 
-internal abstract class InternalStructureDescriptor(override val type: StructureType) : StructureDescriptor {
+internal abstract class StructureDescriptorImpl(override val type: StructureType) : StructureDescriptor {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
-		if (other !is InternalStructureDescriptor) return false
+		if (other !is StructureDescriptorImpl) return false
 		if (type != other.type) return false
 		return true
 	}
@@ -41,11 +42,11 @@ internal abstract class InternalStructureDescriptor(override val type: Structure
 	}
 }
 
-internal class InternalEnumDescriptor(
+internal class EnumDescriptorImpl(
 	type: StructureType,
 	values: List<EnumValue>,
 	lastValueId: Int = 0
-) : InternalStructureDescriptor(type), EnumDescriptor {
+) : StructureDescriptorImpl(type), EnumDescriptor {
 	override val values = values.toMutableList()
 	
 	override var lastValueId = lastValueId
@@ -73,13 +74,13 @@ internal class InternalEnumDescriptor(
 	}
 }
 
-internal class InternalEntityDescriptor(
+internal class EntityDescriptorImpl(
 	type: StructureType,
 	override var id: Int,
 	override var parent: StructureType?,
 	override var abstract: Boolean,
 	fields: List<EntityField>
-) : InternalStructureDescriptor(type), EntityDescriptor {
+) : StructureDescriptorImpl(type), EntityDescriptor {
 	
 	override val children = mutableSetOf<StructureType>()
 	

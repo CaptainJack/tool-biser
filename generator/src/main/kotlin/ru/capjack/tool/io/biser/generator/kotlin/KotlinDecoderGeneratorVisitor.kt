@@ -1,6 +1,8 @@
 package ru.capjack.tool.io.biser.generator.kotlin
 
 import ru.capjack.tool.io.biser.generator.CodeBlock
+import ru.capjack.tool.io.biser.generator.CodePath
+import ru.capjack.tool.io.biser.generator.ImportsCollection
 import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
 import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
 import ru.capjack.tool.io.biser.generator.model.ListType
@@ -14,12 +16,10 @@ import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 class KotlinDecoderGeneratorVisitor(
 	private val readCalls: TypeVisitor<String, Unit>,
 	private val decoderNames: TypeVisitor<String, Unit>,
-	private val typeNames: TypeVisitor<String, Unit>,
-	structuresPackage: String
+	private val typeNames: TypeVisitor<String, ImportsCollection>,
+	private val targetPackage: CodePath
 ) : TypeVisitor<Unit, KotlinGeneratorContext>,
 	StructureDescriptorVisitor<Unit, KotlinGeneratorContext> {
-	
-	private val structuresPackagePrefix = "$structuresPackage."
 	
 	private val entityFieldTypesVisitor = object :
 		TypeVisitor<Unit, KotlinGeneratorContext> {
@@ -51,7 +51,7 @@ class KotlinDecoderGeneratorVisitor(
 	}
 	
 	override fun visitStructureType(type: StructureType, data: KotlinGeneratorContext) {
-		data.imports.addImport(structuresPackagePrefix + type.name)
+		data.imports.addImport(targetPackage.resolve(type.path))
 		type.descriptor.accept(this, data)
 	}
 	
@@ -63,7 +63,7 @@ class KotlinDecoderGeneratorVisitor(
 	
 	override fun visitEnumStructureDescriptor(descriptor: EnumDescriptor, data: KotlinGeneratorContext) {
 		val type = descriptor.type
-		val typeName = type.accept(typeNames)
+		val typeName = type.accept(typeNames, data.imports)
 		writeDeclaration(type, data).apply {
 			identBracketsCurly("when (val id = readInt()) ") {
 				descriptor.values.forEach {
@@ -107,7 +107,7 @@ class KotlinDecoderGeneratorVisitor(
 						line("${descriptor.id} -> ${name}_RAW()")
 					}
 					
-					val typeName = type.accept(typeNames)
+					val typeName = type.accept(typeNames, data.imports)
 					data.imports.addImport("ru.capjack.tool.io.biser.UnknownIdDecoderException")
 					line("else -> throw UnknownIdDecoderException(id, $typeName::class)")
 				}
@@ -121,7 +121,7 @@ class KotlinDecoderGeneratorVisitor(
 	}
 	
 	private fun CodeBlock.writeEntityDecode(descriptor: EntityDescriptor, data: KotlinGeneratorContext) {
-		identBracketsRound(descriptor.type.name.substringAfterLast('.')) {
+		identBracketsRound(descriptor.type.path.name) {
 			val last = descriptor.fields.size - 1
 			descriptor.fields.forEachIndexed { i, field ->
 				field.type.accept(entityFieldTypesVisitor, data)
@@ -134,7 +134,7 @@ class KotlinDecoderGeneratorVisitor(
 		context.imports.addImport("ru.capjack.tool.io.biser.Decoder")
 		
 		var name = type.accept(decoderNames)
-		val typeName = type.accept(typeNames)
+		val typeName = type.accept(typeNames, context.imports)
 		
 		if (raw) {
 			name += "_RAW"

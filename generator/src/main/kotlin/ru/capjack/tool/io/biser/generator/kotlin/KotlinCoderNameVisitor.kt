@@ -1,5 +1,6 @@
 package ru.capjack.tool.io.biser.generator.kotlin
 
+import ru.capjack.tool.io.biser.generator.CoderNameScopeVisitor
 import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
 import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
 import ru.capjack.tool.io.biser.generator.model.ListType
@@ -9,9 +10,8 @@ import ru.capjack.tool.io.biser.generator.model.StructureDescriptorVisitor
 import ru.capjack.tool.io.biser.generator.model.StructureType
 import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 
-open class KotlinCoderNameVisitor(encoder: Boolean) : TypeVisitor<String, Unit>, StructureDescriptorVisitor<String, String> {
+open class KotlinCoderNameVisitor(val scope: CoderNameScopeVisitor) : TypeVisitor<String, Unit>, StructureDescriptorVisitor<String, String> {
 	private var deep = 0
-	private val primitiveName = if (encoder) "Encoders" else "Decoders"
 	
 	override fun visitPrimitiveType(type: PrimitiveType, data: Unit): String {
 		val name = when (type) {
@@ -27,25 +27,26 @@ open class KotlinCoderNameVisitor(encoder: Boolean) : TypeVisitor<String, Unit>,
 			PrimitiveType.LONG_ARRAY    -> "LONG_ARRAY"
 			PrimitiveType.DOUBLE_ARRAY  -> "DOUBLE_ARRAY"
 		}
-		return if (deep == 0) "$primitiveName.$name" else name
+		return if (deep == 0) scope.visitPrimitiveScope(name) else name
 	}
 	
 	override fun visitListType(type: ListType, data: Unit): String {
 		++deep
-		val name = "LIST_" + type.element.accept(this)
+		val name = "LIST_" + type.element.accept(this, data)
 		--deep
-		return name
+		return if (deep == 0) scope.visitGeneratedScope(name) else name
 	}
 	
 	override fun visitStructureType(type: StructureType, data: Unit): String {
-		return type.descriptor.accept(this, type.name.replace(".", "_"))
+		val name = type.descriptor.accept(this, type.path.asString('_'))
+		return if (deep == 0) scope.visitGeneratedScope(name) else name
 	}
 	
 	override fun visitNullableType(type: NullableType, data: Unit): String {
 		++deep
-		val name = "NULLABLE_" + type.original.accept(this)
+		val name = "NULLABLE_" + type.original.accept(this, data)
 		--deep
-		return name
+		return if (deep == 0) scope.visitGeneratedScope(name) else name
 	}
 	
 	override fun visitEnumStructureDescriptor(descriptor: EnumDescriptor, data: String): String {
@@ -56,3 +57,4 @@ open class KotlinCoderNameVisitor(encoder: Boolean) : TypeVisitor<String, Unit>,
 		return "ENTITY_$data"
 	}
 }
+

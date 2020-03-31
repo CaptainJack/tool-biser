@@ -1,5 +1,6 @@
 package ru.capjack.tool.io.biser.generator.model
 
+import ru.capjack.tool.io.biser.generator.CodePath
 import java.util.*
 
 interface Type {
@@ -29,7 +30,7 @@ enum class PrimitiveType : Type {
 }
 
 interface StructureType : Type {
-	val name: String
+	val path: CodePath
 	val descriptor: StructureDescriptor
 }
 

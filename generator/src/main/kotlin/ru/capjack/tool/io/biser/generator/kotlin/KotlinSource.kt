@@ -1,7 +1,5 @@
 package ru.capjack.tool.io.biser.generator.kotlin
 
-import com.intellij.openapi.util.Disposer
-import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.analyzer.ResolverForSingleModuleProject
 import org.jetbrains.kotlin.analyzer.common.CommonAnalysisParameters
@@ -14,6 +12,8 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import org.jetbrains.kotlin.com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.tryGetService
 import org.jetbrains.kotlin.context.ProjectContext
@@ -25,13 +25,13 @@ import org.jetbrains.kotlin.resolve.CompilerEnvironment
 import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer
 import org.jetbrains.kotlin.resolve.PlatformDependentAnalyzerServices
 import org.jetbrains.kotlin.resolve.TopDownAnalysisMode
-import ru.capjack.tool.logging.Logging
+import org.slf4j.LoggerFactory
 import java.nio.file.Path
 
 class KotlinSource(dir: Path) {
 	val classDescriptors: Collection<ClassDescriptor>
 	
-	private val logger = Logging.getLogger(this::class)
+	private val logger = LoggerFactory.getLogger(this::class.java)
 	
 	init {
 		

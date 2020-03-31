@@ -2,7 +2,7 @@ package ru.capjack.tool.io.biser.generator
 
 import ru.capjack.tool.io.biser.generator.model.Type
 
-class TypeAggregator : TypeCollector {
+class TypeAggregator : TypeCollector, Iterator<Type> {
 	private val passedTypes = mutableSetOf<Type>()
 	private val remainedTypes = mutableSetOf<Type>()
 	
@@ -12,8 +12,12 @@ class TypeAggregator : TypeCollector {
 		}
 	}
 	
-	fun next(): Type? {
-		return remainedTypes.firstOrNull()?.also {
+	override fun hasNext(): Boolean {
+		return remainedTypes.isNotEmpty()
+	}
+	
+	override fun next(): Type {
+		return remainedTypes.first().also {
 			remainedTypes.remove(it)
 			passedTypes.add(it)
 		}

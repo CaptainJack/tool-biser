@@ -6,9 +6,45 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
+class CodePath(val value: String) {
+	val name: String
+		by lazy { value.substringAfterLast('.') }
+	
+	val parent: CodePath?
+		by lazy { value.lastIndexOf('.').takeIf { it != -1 }?.let { CodePath(value.substring(0, it)) } }
+	
+	fun asString(separator: Char): String {
+		return if (separator == '.') value else value.replace('.', separator)
+	}
+	
+	override fun toString(): String {
+		return value
+	}
+	
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (other !is CodePath) return false
+		if (value != other.value) return false
+		return true
+	}
+	
+	override fun hashCode(): Int {
+		return value.hashCode()
+	}
+	
+	fun resolve(name: String): CodePath {
+		return CodePath("$value.$name")
+	}
+	
+	fun resolve(name: CodePath): CodePath {
+		return CodePath("$value.${name.value}")
+	}
+}
+
 open class CodeFile : CodeBlock() {
-	open fun write(file: Path) {
-		Files.newBufferedWriter(file, Charsets.UTF_8).use {
+	open fun write(path: Path) {
+		Files.createDirectories(path.parent)
+		Files.newBufferedWriter(path, Charsets.UTF_8).use {
 			write(it)
 		}
 	}
@@ -41,6 +77,10 @@ open class CodeBlock(private val ident: Int = 0) : CodeStatement {
 		append(CodeLine("\t".repeat(ident)))
 	}
 	
+	inline fun line(v: StringBuilder.() -> Unit) {
+		line(StringBuilder().apply(v).toString())
+	}
+	
 	fun <T : CodeStatement> prepend(statement: T): T {
 		statements.addFirst(statement)
 		return statement
@@ -57,6 +97,10 @@ open class CodeBlock(private val ident: Int = 0) : CodeStatement {
 	
 	inline fun ident(block: CodeBlock.() -> Unit) {
 		ident().block()
+	}
+	
+	fun identLine(v: String) {
+		append(CodeLine("\t".repeat(ident + 1) + v))
 	}
 	
 	fun identBracketsCurly(line: String): CodeBlock {

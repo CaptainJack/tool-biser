@@ -5,6 +5,7 @@ package ru.capjack.tool.io.biser.generator.kotlin
 import ru.capjack.tool.io.biser.generator.model.Change
 import ru.capjack.tool.io.biser.generator.model.Model
 import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -13,7 +14,7 @@ class KotlinModuleLoaderTest {
 	fun `Load to empty model`() {
 		
 		val model = Model()
-		val path = Path.of(javaClass.getResource("/example/stubs.kt").toURI())
+		val path = Paths.get(javaClass.getResource("/example/stubs.kt").toURI())
 		
 		KotlinModelLoader(model, KotlinSource(path), "example").load()
 		
@@ -273,7 +274,7 @@ class KotlinModuleLoaderTest {
 		val model = Model()
 		model.load(data)
 		
-		val path = Path.of(javaClass.getResource("/example/stubs.kt").toURI())
+		val path = Paths.get(javaClass.getResource("/example/stubs.kt").toURI())
 		
 		KotlinModelLoader(model, KotlinSource(path), "example").load()
 		
@@ -344,7 +345,7 @@ class KotlinModuleLoaderTest {
 		val model = Model()
 		model.load(data)
 		
-		val path = Path.of(javaClass.getResource("/example/stubs.kt").toURI())
+		val path = Paths.get(javaClass.getResource("/example/stubs.kt").toURI())
 		
 		KotlinModelLoader(model, KotlinSource(path), "example").load()
 		
@@ -478,7 +479,7 @@ class KotlinModuleLoaderTest {
 		val model = Model()
 		model.load(data)
 		
-		val path = Path.of(javaClass.getResource("/example/stubs.kt").toURI())
+		val path = Paths.get(javaClass.getResource("/example/stubs.kt").toURI())
 		
 		KotlinModelLoader(model, KotlinSource(path), "example").load()
 		

@@ -5,7 +5,7 @@ plugins {
 
 kotlin {
 	jvm {
-		compilations.all { kotlinOptions.jvmTarget = "11" }
+		compilations.all { kotlinOptions.jvmTarget = "1.8" }
 	}
 	js {
 		compilations.all { kotlinOptions.sourceMap = false }
@@ -15,9 +15,9 @@ kotlin {
 	sourceSets {
 		get("commonMain").dependencies {
 			implementation(kotlin("stdlib-common"))
-			implementation("ru.capjack.tool:tool-lang:1.1.0")
-			implementation("ru.capjack.tool:tool-io:0.5.0")
-			implementation("ru.capjack.tool:tool-utils:0.7.0")
+			implementation("ru.capjack.tool:tool-lang:1.2.0")
+			implementation("ru.capjack.tool:tool-io:0.6.1")
+			implementation("ru.capjack.tool:tool-utils:0.9.0")
 		}
 		get("commonTest").dependencies {
 			implementation(kotlin("test-common"))

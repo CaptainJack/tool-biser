@@ -6,8 +6,7 @@ import ru.capjack.tool.io.biser.generator.model.PrimitiveType
 import ru.capjack.tool.io.biser.generator.model.StructureType
 import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 
-class KotlinWriteCallVisitor(private val names: TypeVisitor<String, Unit>) :
-	TypeVisitor<String, String> {
+class KotlinWriteCallVisitor(private val names: TypeVisitor<String, Unit>) : TypeVisitor<String, String> {
 	
 	override fun visitPrimitiveType(type: PrimitiveType, data: String): String {
 		return when (type) {
@@ -36,5 +35,4 @@ class KotlinWriteCallVisitor(private val names: TypeVisitor<String, Unit>) :
 	override fun visitNullableType(type: NullableType, data: String): String {
 		return "write($data, ${type.accept(names)})"
 	}
-	
 }

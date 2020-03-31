@@ -1,13 +1,15 @@
 package ru.capjack.tool.io.biser.generator.kotlin
 
+import ru.capjack.tool.io.biser.generator.CodePath
+import ru.capjack.tool.io.biser.generator.ImportsCollection
 import ru.capjack.tool.io.biser.generator.model.ListType
 import ru.capjack.tool.io.biser.generator.model.NullableType
 import ru.capjack.tool.io.biser.generator.model.PrimitiveType
 import ru.capjack.tool.io.biser.generator.model.StructureType
 import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 
-class KotlinTypeNameVisitor : TypeVisitor<String, Unit> {
-	override fun visitPrimitiveType(type: PrimitiveType, data: Unit): String {
+class KotlinTypeNameVisitor(private val targetPackage: CodePath) : TypeVisitor<String, ImportsCollection> {
+	override fun visitPrimitiveType(type: PrimitiveType, data: ImportsCollection): String {
 		return when (type) {
 			PrimitiveType.BOOLEAN       -> "Boolean"
 			PrimitiveType.BYTE          -> "Byte"
@@ -23,15 +25,16 @@ class KotlinTypeNameVisitor : TypeVisitor<String, Unit> {
 		}
 	}
 	
-	override fun visitListType(type: ListType, data: Unit): String {
+	override fun visitListType(type: ListType, data: ImportsCollection): String {
 		return "List<${type.element.accept(this, data)}>"
 	}
 	
-	override fun visitStructureType(type: StructureType, data: Unit): String {
-		return type.name.substringAfterLast('.')
+	override fun visitStructureType(type: StructureType, data: ImportsCollection): String {
+		data.addImport(targetPackage.resolve(type.path))
+		return type.path.name
 	}
 	
-	override fun visitNullableType(type: NullableType, data: Unit): String {
+	override fun visitNullableType(type: NullableType, data: ImportsCollection): String {
 		return type.original.accept(this, data) + '?'
 	}
 	

@@ -6,8 +6,7 @@ import ru.capjack.tool.io.biser.generator.model.PrimitiveType
 import ru.capjack.tool.io.biser.generator.model.StructureType
 import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 
-class KotlinReadCallVisitor(private val names: TypeVisitor<String, Unit>) :
-	TypeVisitor<String, Unit> {
+class KotlinReadCallVisitor(private val names: TypeVisitor<String, Unit>) : TypeVisitor<String, Unit> {
 	
 	override fun visitPrimitiveType(type: PrimitiveType, data: Unit): String {
 		return when (type) {
