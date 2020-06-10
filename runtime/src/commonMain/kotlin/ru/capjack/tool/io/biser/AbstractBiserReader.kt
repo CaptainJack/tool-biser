@@ -16,6 +16,19 @@ abstract class AbstractBiserReader : BiserReader {
 	override fun readInt(): Int {
 		val b = i(readByte())
 		
+		return when (b) {
+			0xFF -> -1
+			0xFE -> {
+				readToMemory(4)
+				(i(memory[0]) shl 24)
+					.or(i(memory[1]) shl 16)
+					.or(i(memory[2]) shl 8)
+					.or(i(memory[3]))
+			}
+			else -> b
+		}
+		
+		/* TODO Legacy
 		when {
 			b and 0x80 == 0x00 ->
 				return b
@@ -55,11 +68,19 @@ abstract class AbstractBiserReader : BiserReader {
 					.or(i(memory[3]))
 			}
 		}
+		 */
 	}
 	
 	override fun readLong(): Long {
 		val b = i(readByte())
 		
+		return when (b) {
+			0xFF -> -1
+			0xFE -> readLongRaw()
+			else -> b.toLong()
+		}
+		
+		/* TODO Legacy
 		when {
 			b and 0x80 == 0x00 ->
 				return b.toLong()
@@ -94,6 +115,7 @@ abstract class AbstractBiserReader : BiserReader {
 			else               ->
 				return readLongRaw()
 		}
+		*/
 	}
 	
 	override fun readDouble(): Double {
@@ -150,6 +172,8 @@ abstract class AbstractBiserReader : BiserReader {
 	protected abstract fun readByteArray(size: Int): ByteArray
 	
 	private fun readBooleanArray(size: Int): BooleanArray {
+		return BooleanArray(size) { readBoolean() }
+		/* TODO Legacy
 		var bit = 7
 		var byte = 0
 		
@@ -161,6 +185,7 @@ abstract class AbstractBiserReader : BiserReader {
 			val m = 1 shl bit
 			byte and m == m
 		}
+		*/
 	}
 	
 	private fun readIntArray(size: Int): IntArray {

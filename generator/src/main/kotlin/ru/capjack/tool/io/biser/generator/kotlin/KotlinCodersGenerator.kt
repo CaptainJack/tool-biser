@@ -43,7 +43,7 @@ class KotlinCodersGenerator(
 	}))
 	
 	private val outerReadCallVisitor: TypeVisitor<String, Unit> = KotlinReadCallVisitor(KotlinCoderNameVisitor(object : CoderNameScopeVisitor {
-		override fun visitPrimitiveScope(name: String) = "Encoders.$name"
+		override fun visitPrimitiveScope(name: String) = "Decoders.$name"
 		override fun visitGeneratedScope(name: String) = decodersPath.name + '.' + name
 	}))
 	

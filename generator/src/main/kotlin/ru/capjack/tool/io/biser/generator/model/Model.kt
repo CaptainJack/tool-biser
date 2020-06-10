@@ -3,6 +3,7 @@ package ru.capjack.tool.io.biser.generator.model
 import org.yaml.snakeyaml.Yaml
 import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.GeneratorException
+import kotlin.math.max
 
 open class Model {
 	var change = Change.ABSENT
@@ -147,15 +148,18 @@ open class Model {
 	@Suppress("UNCHECKED_CAST")
 	protected open fun load(data: Map<String, Any>) {
 		lastEntityId = data["lastEntityId"] as Int
+		var maxEntityId = 0
 		
 		data["structures"].asObjectList().associateTo(_structures) { s ->
 			val name = s["name"] as String
 			Pair(name,
 				(
-					if (s.containsKey("id"))
+					if (s.containsKey("id")) {
+						val id = s["id"] as Int
+						maxEntityId = max(id, maxEntityId)
 						EntityDescriptorImpl(
 							provideStructureType(name),
-							s["id"] as Int,
+							id,
 							(s["parent"] as String?)?.let { provideStructureType(it) },
 							s["abstract"] as Boolean,
 							s["fields"].asObjectList().map { f ->
@@ -165,6 +169,7 @@ open class Model {
 								)
 							}
 						)
+					}
 					else
 						EnumDescriptorImpl(
 							provideStructureType(name),
@@ -179,6 +184,8 @@ open class Model {
 					).also { structureTypes[name]?.descriptor = it }
 			)
 		}
+		
+		lastEntityId = max(maxEntityId, lastEntityId)
 	}
 	
 	protected fun loadType(name: String): Type {

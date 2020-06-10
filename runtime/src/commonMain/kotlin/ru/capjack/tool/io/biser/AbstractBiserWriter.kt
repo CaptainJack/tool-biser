@@ -9,6 +9,19 @@ abstract class AbstractBiserWriter : BiserWriter {
 	
 	@Suppress("ConvertTwoComparisonsToRangeCheck", "CascadeIf")
 	override fun writeInt(value: Int) {
+		when (value) {
+			-1        -> writeByte(0xFF.toByte())
+			in 0..253 -> writeByte(value.toByte())
+			else      -> {
+				memory[0] = xFE
+				memory[1] = value ushr 24
+				memory[2] = value ushr 16
+				memory[3] = value ushr 8
+				memory[4] = value
+				writeByteArrayRaw(memory, 5)
+			}
+		}
+		/* TODO Legacy
 		if (value >= 0) {
 			if (value < 128) {
 				writeByte(value.toByte())
@@ -78,9 +91,28 @@ abstract class AbstractBiserWriter : BiserWriter {
 			memory[4] = value
 			writeByteArrayRaw(memory, 5)
 		}
+		*/
 	}
 	
 	override fun writeLong(value: Long) {
+		when (value) {
+			-1L       -> writeByte(0xFF.toByte())
+			in 0..253 -> writeByte(value.toByte())
+			else      -> {
+				memory[0] = xFE
+				memory[1] = value ushr 56
+				memory[2] = value ushr 48
+				memory[3] = value ushr 40
+				memory[4] = value ushr 32
+				memory[5] = value ushr 24
+				memory[6] = value ushr 16
+				memory[7] = value ushr 8
+				memory[8] = value
+				writeByteArrayRaw(memory, 9)
+			}
+		}
+		
+		/* TODO Legacy
 		if (value >= -33554433 && value < 471875712) {
 			writeInt(value.toInt())
 		}
@@ -96,6 +128,7 @@ abstract class AbstractBiserWriter : BiserWriter {
 			memory[8] = value
 			writeByteArrayRaw(memory, 9)
 		}
+		*/
 	}
 	
 	override fun writeDouble(value: Double) {
@@ -113,6 +146,9 @@ abstract class AbstractBiserWriter : BiserWriter {
 	
 	@Suppress("DuplicatedCode")
 	override fun writeBooleanArray(value: BooleanArray) {
+		writeInt(value.size)
+		value.forEach(::writeBoolean)
+		/* TODO Legacy
 		var s = value.size
 		writeInt(s)
 		if (s != 0) {
@@ -143,6 +179,7 @@ abstract class AbstractBiserWriter : BiserWriter {
 			
 			writeByteArrayRaw(bytes, bytes.size)
 		}
+		*/
 	}
 	
 	override fun writeByteArray(value: ByteArray) {
@@ -198,6 +235,10 @@ abstract class AbstractBiserWriter : BiserWriter {
 	
 	@Suppress("DuplicatedCode")
 	private fun writeBooleanList(value: List<Boolean>) {
+		writeInt(value.size)
+		value.forEach(::writeBoolean)
+		
+		/* TODO Legacy
 		var s = value.size
 		writeInt(s)
 		if (s != 0) {
@@ -228,6 +269,7 @@ abstract class AbstractBiserWriter : BiserWriter {
 			
 			writeByteArrayRaw(bytes, bytes.size)
 		}
+		*/
 	}
 	
 	override fun <T> write(value: T, encoder: Encoder<T>) {

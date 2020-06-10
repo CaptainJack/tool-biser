@@ -21,24 +21,27 @@ class KotlinDecoderGeneratorVisitor(
 ) : TypeVisitor<Unit, KotlinGeneratorContext>,
 	StructureDescriptorVisitor<Unit, KotlinGeneratorContext> {
 	
-	private val entityFieldTypesVisitor = object :
-		TypeVisitor<Unit, KotlinGeneratorContext> {
+	private val entityFieldTypesVisitor = object : TypeVisitor<Unit, KotlinGeneratorContext> {
+		private var deep = 0
+		
 		override fun visitPrimitiveType(type: PrimitiveType, data: KotlinGeneratorContext) {
 			data.imports.addImport("ru.capjack.tool.io.biser.Decoders")
 		}
 		
 		override fun visitListType(type: ListType, data: KotlinGeneratorContext) {
 			data.types.add(type.element)
+			++deep
+			type.element.accept(this, data)
+			--deep
 		}
 		
 		override fun visitStructureType(type: StructureType, data: KotlinGeneratorContext) {
-			data.types.add(type)
+			if (deep == 0) data.types.add(type)
 		}
 		
 		override fun visitNullableType(type: NullableType, data: KotlinGeneratorContext) {
-			data.types.add(type)
+			if (deep == 0) data.types.add(type)
 		}
-		
 	}
 	
 	override fun visitPrimitiveType(type: PrimitiveType, data: KotlinGeneratorContext) {
@@ -56,6 +59,7 @@ class KotlinDecoderGeneratorVisitor(
 	}
 	
 	override fun visitNullableType(type: NullableType, data: KotlinGeneratorContext) {
+		data.types.add(type.original)
 		writeDeclaration(type, data).apply {
 			line("if (readInt() == 0) null else ${type.original.accept(decoderNames)}()")
 		}
@@ -67,7 +71,8 @@ class KotlinDecoderGeneratorVisitor(
 		writeDeclaration(type, data).apply {
 			identBracketsCurly("when (val id = readInt()) ") {
 				descriptor.values.forEach {
-					line("${it.id} -> $typeName.${it.name}")
+					//TODO Legacy line("${it.id} -> $typeName.${it.name}")
+					line("${it.id - 1} -> $typeName.${it.name}")
 				}
 				data.imports.addImport("ru.capjack.tool.io.biser.UnknownIdDecoderException")
 				line("else -> throw UnknownIdDecoderException(id, $typeName::class)")

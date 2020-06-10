@@ -22,6 +22,7 @@ class KotlinEncoderGeneratorVisitor(
 	
 	private val entityFieldTypesVisitor = object : TypeVisitor<Unit, KotlinGeneratorContext> {
 		private var deep = 0
+		
 		override fun visitPrimitiveType(type: PrimitiveType, data: KotlinGeneratorContext) {
 			if (deep != 0) {
 				data.imports.addImport("ru.capjack.tool.io.biser.Encoders")
@@ -59,9 +60,12 @@ class KotlinEncoderGeneratorVisitor(
 	}
 	
 	override fun visitNullableType(type: NullableType, data: KotlinGeneratorContext) {
+		data.types.add(type.original)
 		writeDeclaration(type, data).apply {
-			identBracketsCurly("if (it == null) writeInt(0) else ") {
-				line("writeInt(1)")
+			//TODO Legacy
+			//identBracketsCurly("if (it == null) writeInt(0) else ") {
+			//  line("writeInt(1)")
+			identBracketsCurly("if (it == null) writeInt(-1) else ") {
 				line("${type.original.accept(encoderNames)}(it)")
 			}
 		}
@@ -74,7 +78,8 @@ class KotlinEncoderGeneratorVisitor(
 			line("writeInt(when (it) {")
 			ident {
 				descriptor.values.forEach {
-					line("$typeName.${it.name} -> ${it.id}")
+					//TODO Legacy line("$typeName.${it.name} -> ${it.id}")
+					line("$typeName.${it.name} -> ${it.id - 1}")
 				}
 			}
 			line("})")
@@ -91,9 +96,11 @@ class KotlinEncoderGeneratorVisitor(
 					descriptor.children.forEach { child ->
 						identBracketsCurly("is ${child.accept(typeNames, data.imports)} -> ") {
 							with(child.descriptor as EntityDescriptor) {
+								data.types.add(child)
+								/*TODO Legacy
 								if (children.isEmpty()) {
 									line("writeInt(${id})")
-								}
+								}*/
 							}
 							line("${child.accept(encoderNames)}(it)")
 						}
@@ -117,9 +124,11 @@ class KotlinEncoderGeneratorVisitor(
 	}
 	
 	private fun CodeBlock.writeEntityFields(descriptor: EntityDescriptor, data: KotlinGeneratorContext) {
+		/*TODO Legacy
 		if (descriptor.children.isNotEmpty()) {
 			line("writeInt(${descriptor.id})")
-		}
+		}*/
+		line("writeInt(${descriptor.id})")
 		descriptor.fields.forEach { field ->
 			field.type.accept(entityFieldTypesVisitor, data)
 			line(field.type.accept(writeCalls, "it.${field.name}"))
