@@ -1,5 +1,6 @@
 package ru.capjack.tool.io.biser.generator.kotlin
 
+import org.junit.Ignore
 import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.model.Model
 import java.nio.file.Files
@@ -7,6 +8,7 @@ import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Ignore //TODO Legacy
 class KotlinCodersGeneratorTest {
 	@Test
 	fun `Load model and generate`() {

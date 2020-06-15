@@ -92,9 +92,34 @@ open class Model {
 		}
 	}
 	
+	fun provideObjectStructure(name: String, parent: String?): ObjectDescriptor {
+		val descriptor = _structures[name]
+		val parentType = parent?.let(::provideStructureType)
+		
+		if (descriptor != null) {
+			if (descriptor !is ObjectDescriptorImpl) {
+				throw GeneratorException(name)
+			}
+			raiseChange(descriptor.update(parentType))
+			return descriptor
+		}
+		
+		raiseChange(Change.COMPATIBLY)
+		
+		return ObjectDescriptorImpl(provideStructureType(name), ++lastEntityId, parentType).also {
+			_structures[name] = it
+			structureTypes[name]?.descriptor = it
+		}
+	}
+	
 	fun complete() {
 		for (descriptor in _structures.values) {
 			if (descriptor is EntityDescriptorImpl) {
+				(descriptor.parent?.descriptor as? EntityDescriptorImpl)?.also {
+					it.children.add(descriptor.type)
+				}
+			}
+			else if (descriptor is ObjectDescriptorImpl) {
 				(descriptor.parent?.descriptor as? EntityDescriptorImpl)?.also {
 					it.children.add(descriptor.type)
 				}
@@ -139,6 +164,12 @@ open class Model {
 					)
 				}
 			)
+			
+			override fun visitObjectStructureDescriptor(descriptor: ObjectDescriptor, data: Unit) = mapOf(
+				"name" to descriptor.type.path.value,
+				"id" to descriptor.id,
+				"parent" to descriptor.parent?.path?.value
+			)
 		}
 		
 		data["lastEntityId"] = lastEntityId
@@ -157,18 +188,27 @@ open class Model {
 					if (s.containsKey("id")) {
 						val id = s["id"] as Int
 						maxEntityId = max(id, maxEntityId)
-						EntityDescriptorImpl(
-							provideStructureType(name),
-							id,
-							(s["parent"] as String?)?.let { provideStructureType(it) },
-							s["abstract"] as Boolean,
-							s["fields"].asObjectList().map { f ->
-								EntityField(
-									f["name"] as String,
-									loadType(f["type"] as String)
-								)
-							}
-						)
+						if (s.containsKey("fields")) {
+							EntityDescriptorImpl(
+								provideStructureType(name),
+								id,
+								(s["parent"] as String?)?.let { provideStructureType(it) },
+								s["abstract"] as Boolean,
+								s["fields"].asObjectList().map { f ->
+									EntityField(
+										f["name"] as String,
+										loadType(f["type"] as String)
+									)
+								}
+							)
+						}
+						else {
+							ObjectDescriptorImpl(
+								provideStructureType(name),
+								id,
+								(s["parent"] as String?)?.let { provideStructureType(it) }
+							)
+						}
 					}
 					else
 						EnumDescriptorImpl(

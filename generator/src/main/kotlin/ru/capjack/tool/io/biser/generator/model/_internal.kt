@@ -114,3 +114,27 @@ internal class EntityDescriptorImpl(
 	
 }
 
+
+internal class ObjectDescriptorImpl(
+	type: StructureType,
+	override var id: Int,
+	override var parent: StructureType?
+) : StructureDescriptorImpl(type), ObjectDescriptor {
+	
+	override fun <R, D> accept(visitor: StructureDescriptorVisitor<R, D>, data: D): R {
+		return visitor.visitObjectStructureDescriptor(this, data)
+	}
+	
+	fun update(parent: StructureType?): Change {
+		var change = Change.ABSENT
+		
+		if (this.parent != parent) {
+			this.parent = parent
+			change = Change.FULL
+		}
+		
+		return change
+	}
+	
+}
+

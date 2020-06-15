@@ -26,7 +26,12 @@ interface EntityDescriptor : StructureDescriptor {
 	val parent: StructureType?
 	
 	val allChildren: Set<StructureType>
-		get() = children + children.flatMap { (it.descriptor as EntityDescriptor).allChildren }.toSet()
+		get() = children + children.flatMap { (it.descriptor as? EntityDescriptor)?.allChildren.orEmpty() }.toSet()
+}
+
+interface ObjectDescriptor : StructureDescriptor {
+	val id: Int
+	val parent: StructureType?
 }
 
 class EntityField(

@@ -5,6 +5,7 @@ import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
 import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
 import ru.capjack.tool.io.biser.generator.model.ListType
 import ru.capjack.tool.io.biser.generator.model.NullableType
+import ru.capjack.tool.io.biser.generator.model.ObjectDescriptor
 import ru.capjack.tool.io.biser.generator.model.PrimitiveType
 import ru.capjack.tool.io.biser.generator.model.StructureDescriptorVisitor
 import ru.capjack.tool.io.biser.generator.model.StructureType
@@ -55,6 +56,10 @@ open class KotlinCoderNameVisitor(val scope: CoderNameScopeVisitor) : TypeVisito
 	
 	override fun visitEntityStructureDescriptor(descriptor: EntityDescriptor, data: String): String {
 		return "ENTITY_$data"
+	}
+	
+	override fun visitObjectStructureDescriptor(descriptor: ObjectDescriptor, data: String): String {
+		return "OBJECT_$data"
 	}
 }
 

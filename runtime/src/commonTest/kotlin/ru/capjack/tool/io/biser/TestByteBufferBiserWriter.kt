@@ -2,8 +2,10 @@ package ru.capjack.tool.io.biser
 
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.readToArray
+import kotlin.test.Ignore
 import kotlin.test.Test
 
+@Ignore //TODO Legacy
 class TestByteBufferBiserWriter {
 	@Test
 	fun testWriteBoolean() {

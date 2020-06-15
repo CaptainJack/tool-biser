@@ -3,15 +3,7 @@ package ru.capjack.tool.io.biser.generator.kotlin
 import ru.capjack.tool.io.biser.generator.CodeBlock
 import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.ImportsCollection
-import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
-import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
-import ru.capjack.tool.io.biser.generator.model.ListType
-import ru.capjack.tool.io.biser.generator.model.NullableType
-import ru.capjack.tool.io.biser.generator.model.PrimitiveType
-import ru.capjack.tool.io.biser.generator.model.StructureDescriptorVisitor
-import ru.capjack.tool.io.biser.generator.model.StructureType
-import ru.capjack.tool.io.biser.generator.model.Type
-import ru.capjack.tool.io.biser.generator.model.TypeVisitor
+import ru.capjack.tool.io.biser.generator.model.*
 
 class KotlinEncoderGeneratorVisitor(
 	private val writeCalls: TypeVisitor<String, String>,
@@ -94,15 +86,22 @@ class KotlinEncoderGeneratorVisitor(
 				
 				identBracketsCurly("when (it) ") {
 					descriptor.children.forEach { child ->
-						identBracketsCurly("is ${child.accept(typeNames, data.imports)} -> ") {
-							with(child.descriptor as EntityDescriptor) {
-								data.types.add(child)
+						data.types.add(child)
+						val childDescriptor = child.descriptor
+						val childTypeName = child.accept(typeNames, data.imports)
+						if (childDescriptor is EntityDescriptor) {
+							identBracketsCurly("is $childTypeName -> ") {
 								/*TODO Legacy
 								if (children.isEmpty()) {
 									line("writeInt(${id})")
 								}*/
+								line("${child.accept(encoderNames)}(it)")
 							}
-							line("${child.accept(encoderNames)}(it)")
+						}
+						else if (childDescriptor is ObjectDescriptor) {
+							identBracketsCurly("$childTypeName -> ") {
+								line("${child.accept(encoderNames)}(it as $childTypeName)")
+							}
 						}
 					}
 					
@@ -121,6 +120,21 @@ class KotlinEncoderGeneratorVisitor(
 				writeEntityFields(descriptor, data)
 			}
 		}
+	}
+	
+	override fun visitObjectStructureDescriptor(descriptor: ObjectDescriptor, data: KotlinGeneratorContext) {
+		val type = descriptor.type
+		
+		data.imports.addImport("ru.capjack.tool.io.biser.Encoder")
+		
+		val name = type.accept(encoderNames)
+		val typeName = type.accept(typeNames, data.imports)
+		
+		data.code.identBracketsCurly("val $name: Encoder<$typeName> = ") {
+			line("writeInt(${descriptor.id})")
+		}
+		
+		data.code.line()
 	}
 	
 	private fun CodeBlock.writeEntityFields(descriptor: EntityDescriptor, data: KotlinGeneratorContext) {

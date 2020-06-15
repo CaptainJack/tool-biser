@@ -3,15 +3,7 @@ package ru.capjack.tool.io.biser.generator.kotlin
 import ru.capjack.tool.io.biser.generator.CodeBlock
 import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.ImportsCollection
-import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
-import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
-import ru.capjack.tool.io.biser.generator.model.ListType
-import ru.capjack.tool.io.biser.generator.model.NullableType
-import ru.capjack.tool.io.biser.generator.model.PrimitiveType
-import ru.capjack.tool.io.biser.generator.model.StructureDescriptorVisitor
-import ru.capjack.tool.io.biser.generator.model.StructureType
-import ru.capjack.tool.io.biser.generator.model.Type
-import ru.capjack.tool.io.biser.generator.model.TypeVisitor
+import ru.capjack.tool.io.biser.generator.model.*
 
 class KotlinDecoderGeneratorVisitor(
 	private val readCalls: TypeVisitor<String, Unit>,
@@ -95,20 +87,25 @@ class KotlinDecoderGeneratorVisitor(
 			writeDeclaration(type, data).apply {
 				identBracketsCurly("when (val id = readInt()) ") {
 					descriptor.allChildren.forEach { child ->
-						val childDescriptor = child.descriptor as EntityDescriptor
-						if (!childDescriptor.abstract) {
-							val name = child.accept(decoderNames)
-							if (childDescriptor.children.isNotEmpty()) {
-								line("${childDescriptor.id} -> ${name}_RAW()")
+						val childDescriptor = child.descriptor
+						val name = child.accept(decoderNames)
+						if (childDescriptor is EntityDescriptor) {
+							if (!childDescriptor.abstract) {
+								if (childDescriptor.children.isNotEmpty()) {
+									line("${childDescriptor.id} -> ${name}_RAW()")
+								}
+								else {
+									line("${childDescriptor.id} -> $name()")
+								}
 							}
-							else {
-								line("${childDescriptor.id} -> $name()")
-							}
+						}
+						else if (childDescriptor is ObjectDescriptor) {
+							line("${childDescriptor.id} -> $name()")
 						}
 					}
 					
 					if (!descriptor.abstract) {
-						val name = descriptor.type.accept(decoderNames)
+						val name = type.accept(decoderNames)
 						line("${descriptor.id} -> ${name}_RAW()")
 					}
 					
@@ -121,6 +118,14 @@ class KotlinDecoderGeneratorVisitor(
 		else {
 			writeDeclaration(type, data).apply {
 				writeEntityDecode(descriptor, data)
+			}
+		}
+	}
+	
+	override fun visitObjectStructureDescriptor(descriptor: ObjectDescriptor, data: KotlinGeneratorContext) {
+		writeDeclaration(descriptor.type, data).apply {
+			ident {
+				line(descriptor.type.path.name)
 			}
 		}
 	}

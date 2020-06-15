@@ -1,9 +1,11 @@
 package ru.capjack.tool.io.biser
 
 import ru.capjack.tool.io.ArrayByteBuffer
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Ignore //TODO Legacy
 class TestByteBufferBiserReader {
 	@Test
 	fun testReadBoolean() {

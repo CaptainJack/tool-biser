@@ -49,6 +49,7 @@ open class KotlinModelLoader<M : Model>(
 	protected open fun processClassDescriptor(descriptor: ClassDescriptor, name: String) {
 		when (descriptor.kind) {
 			ClassKind.CLASS      -> loadEntity(name, descriptor)
+			ClassKind.OBJECT     -> loadObject(name, descriptor)
 			ClassKind.ENUM_CLASS -> loadEnum(name, descriptor)
 			ClassKind.ENUM_ENTRY -> Unit
 			else                 -> throw GeneratorException(descriptor.kind.name)
@@ -83,7 +84,16 @@ open class KotlinModelLoader<M : Model>(
 			EntityField(it.name.toString(), defineType(it.type))
 		}
 		
-		model.provideEntityStructure(name, descriptor.modality == Modality.ABSTRACT, parent, fields)
+		model.provideEntityStructure(name, descriptor.modality == Modality.ABSTRACT || descriptor.modality == Modality.SEALED, parent, fields)
+	}
+	
+	protected open fun loadObject(name: String, descriptor: ClassDescriptor) {
+		
+		val parent = descriptor.getSuperClassNotAny()?.let {
+			extractName(it) ?: throw GeneratorException(it.toString())
+		}
+		
+		model.provideObjectStructure(name, parent)
 	}
 	
 	protected fun defineType(kType: KotlinType): Type {
