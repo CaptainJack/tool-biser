@@ -11,7 +11,7 @@ class CodePath(val value: String) {
 	val name: String
 		by lazy {
 			val path = value.split('.')
-			val namePath = path.dropWhile { it[0].isLowerCase() }
+			val namePath = path.takeLastWhile { it[0].isUpperCase() }
 			if (namePath.isEmpty()) path.last() else namePath.joinToString(".")
 		}
 	
