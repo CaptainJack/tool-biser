@@ -7,11 +7,16 @@ import java.nio.file.Path
 import java.util.*
 
 class CodePath(val value: String) {
+	
 	val name: String
-		by lazy { value.substringAfterLast('.') }
+		by lazy {
+			val path = value.split('.')
+			val namePath = path.dropWhile { it[0].isLowerCase() }
+			if (namePath.isEmpty()) path.last() else namePath.joinToString(".")
+		}
 	
 	val parent: CodePath?
-		by lazy { value.lastIndexOf('.').takeIf { it != -1 }?.let { CodePath(value.substring(0, it)) } }
+		by lazy { if (value == name) null else CodePath(value.dropLast(name.length + 1)) }
 	
 	fun asString(separator: Char): String {
 		return if (separator == '.') value else value.replace('.', separator)

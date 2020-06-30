@@ -23,8 +23,17 @@ class KotlinFile(private val name: CodePath) : CodeFile(), ImportsCollection {
 	override fun write(writer: Writer) {
 		prepend(CodeBlock(0).apply {
 			val pack = name.parent
-			if (pack!=null) {
+			if (pack != null) {
 				line("package ${pack.value}")
+			}
+			
+			val allImports = imports.map { it.value }.sorted()
+			val imports = mutableListOf<String>()
+			
+			allImports.forEach { path ->
+				if (imports.none { path.startsWith("$it.") }) {
+					imports.add(path)
+				}
 			}
 			
 			if (imports.isNotEmpty()) {
