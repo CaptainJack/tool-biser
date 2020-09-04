@@ -31,13 +31,16 @@ open class KotlinModelLoader<M : Model>(
 	private val sourcePackagePrefix: String = "$sourcePackage."
 	
 	open fun load() {
+		model.beginUpdate()
+		
 		for (descriptor in source.classDescriptors) {
 			val name = extractName(descriptor)
 			if (name != null) {
 				processClassDescriptor(descriptor, name)
 			}
 		}
-		model.complete()
+		
+		model.completeUpdate()
 	}
 	
 	protected fun extractName(descriptor: DeclarationDescriptor): String? {

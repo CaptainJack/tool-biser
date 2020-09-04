@@ -55,6 +55,8 @@ open class Model {
 	}
 	
 	fun provideEnumStructure(name: String, values: List<String>): EnumDescriptor {
+		oldStructuresNames.remove(name)
+		
 		val descriptor = _structures[name]
 		if (descriptor != null) {
 			if (descriptor !is EnumDescriptorImpl) {
@@ -73,6 +75,8 @@ open class Model {
 	}
 	
 	fun provideEntityStructure(name: String, abstract: Boolean, parent: String?, fields: List<EntityField>): EntityDescriptor {
+		oldStructuresNames.remove(name)
+		
 		val descriptor = _structures[name]
 		val parentType = parent?.let(::provideStructureType)
 		
@@ -93,6 +97,8 @@ open class Model {
 	}
 	
 	fun provideObjectStructure(name: String, parent: String?): ObjectDescriptor {
+		oldStructuresNames.remove(name)
+		
 		val descriptor = _structures[name]
 		val parentType = parent?.let(::provideStructureType)
 		
@@ -112,7 +118,19 @@ open class Model {
 		}
 	}
 	
-	fun complete() {
+	private val oldStructuresNames = mutableSetOf<String>()
+	
+	open fun beginUpdate() {
+		oldStructuresNames.addAll(_structures.keys)
+	}
+	
+	open fun completeUpdate() {
+		val changed = oldStructuresNames.fold(false) { r, it -> _structures.remove(it) != null || r }
+		if (changed) {
+			raiseChange(Change.FULL)
+		}
+		oldStructuresNames.clear()
+		
 		for (descriptor in _structures.values) {
 			if (descriptor is EntityDescriptorImpl) {
 				(descriptor.parent?.descriptor as? EntityDescriptorImpl)?.also {
@@ -135,7 +153,7 @@ open class Model {
 	
 	fun load(data: String) {
 		load(Yaml().load<Map<String, Any>>(data))
-		complete()
+		completeUpdate()
 	}
 	
 	protected open fun save(data: MutableMap<String, Any>) {
