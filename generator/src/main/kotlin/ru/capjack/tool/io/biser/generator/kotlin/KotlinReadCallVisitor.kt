@@ -33,6 +33,9 @@ class KotlinReadCallVisitor(private val names: TypeVisitor<String, Unit>) : Type
 	}
 	
 	override fun visitNullableType(type: NullableType, data: Unit): String {
+		if (type.original == PrimitiveType.STRING) {
+			return "readStringNullable()"
+		}
 		return "read(${type.accept(names)})"
 	}
 	

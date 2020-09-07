@@ -27,6 +27,8 @@ interface BiserReader {
 	
 	fun readString(): String
 	
+	fun readStringNullable(): String?
+	
 	fun <E> readList(decoder: Decoder<E>): List<E>
 	
 	fun <E> read(decoder: Decoder<E>): E

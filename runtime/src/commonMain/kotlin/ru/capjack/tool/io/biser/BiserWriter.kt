@@ -27,6 +27,8 @@ interface BiserWriter {
 	
 	fun writeString(value: String)
 	
+	fun writeStringNullable(value: String?)
+	
 	fun <E> writeList(value: List<E>, encoder: Encoder<E>)
 	
 	fun <T> write(value: T, encoder: Encoder<T>)

@@ -50,4 +50,13 @@ class ByteBufferBiserWriter(var buffer: OutputByteBuffer) : AbstractBiserWriter(
 			view.commitWrite(size)
 		}
 	}
+	
+	override fun writeStringNullable(value: String?) {
+		if (value == null) {
+			writeInt(-1)
+		}
+		else {
+			writeString(value)
+		}
+	}
 }

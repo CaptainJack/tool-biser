@@ -14,6 +14,7 @@ object Encoders {
 	val DOUBLE_ARRAY: Encoder<DoubleArray> = BiserWriter::writeDoubleArray
 	
 	val STRING: Encoder<String> = BiserWriter::writeString
+	val STRING_NULLABLE: Encoder<String?> = BiserWriter::writeStringNullable
 	
 	fun <E> ofList(encoder: Encoder<E>): Encoder<List<E>> = { writeList(it, encoder) }
 }

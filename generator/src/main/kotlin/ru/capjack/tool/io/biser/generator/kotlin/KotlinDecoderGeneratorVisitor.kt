@@ -51,9 +51,13 @@ class KotlinDecoderGeneratorVisitor(
 	}
 	
 	override fun visitNullableType(type: NullableType, data: KotlinGeneratorContext) {
+		if (type.original == PrimitiveType.STRING) {
+			return
+		}
 		data.types.add(type.original)
 		writeDeclaration(type, data).apply {
-			line("if (readInt() == 0) null else ${type.original.accept(decoderNames)}()")
+			//TODO Legacy
+			line(type.accept(readCalls))
 		}
 	}
 	

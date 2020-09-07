@@ -14,6 +14,7 @@ object Decoders {
 	val DOUBLE_ARRAY: Decoder<DoubleArray> = BiserReader::readDoubleArray
 	
 	val STRING: Decoder<String> = BiserReader::readString
+	val STRING_NULLABLE: Decoder<String?> = BiserReader::readStringNullable
 	
 	fun <T> ofList(decoder: Decoder<T>): Decoder<List<T>> = { readList(decoder) }
 }

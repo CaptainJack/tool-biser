@@ -52,13 +52,16 @@ class KotlinEncoderGeneratorVisitor(
 	}
 	
 	override fun visitNullableType(type: NullableType, data: KotlinGeneratorContext) {
+		if (type.original == PrimitiveType.STRING) {
+			return
+		}
 		data.types.add(type.original)
 		writeDeclaration(type, data).apply {
 			//TODO Legacy
 			//identBracketsCurly("if (it == null) writeInt(0) else ") {
 			//  line("writeInt(1)")
 			identBracketsCurly("if (it == null) writeInt(-1) else ") {
-				line("${type.original.accept(encoderNames)}(it)")
+				line(type.original.accept(writeCalls, "it"))
 			}
 		}
 	}

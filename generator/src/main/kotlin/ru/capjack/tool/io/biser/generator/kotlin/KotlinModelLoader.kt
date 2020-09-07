@@ -101,14 +101,15 @@ open class KotlinModelLoader<M : Model>(
 	
 	protected fun defineType(kType: KotlinType): Type {
 		return when {
-			kType.isBoolean()                          -> PrimitiveType.BOOLEAN
-			kType.isByte()                             -> PrimitiveType.BYTE
-			kType.isInt()                              -> PrimitiveType.INT
-			kType.isLong()                             -> PrimitiveType.LONG
-			kType.isDouble()                           -> PrimitiveType.DOUBLE
-			KotlinBuiltIns.isString(kType)             -> PrimitiveType.STRING
+			kType.isBoolean()                              -> PrimitiveType.BOOLEAN
+			kType.isByte()                                 -> PrimitiveType.BYTE
+			kType.isInt()                                  -> PrimitiveType.INT
+			kType.isLong()                                 -> PrimitiveType.LONG
+			kType.isDouble()                               -> PrimitiveType.DOUBLE
+			KotlinBuiltIns.isString(kType)                 -> PrimitiveType.STRING
+			KotlinBuiltIns.isStringOrNullableString(kType) -> model.provideNullableType(PrimitiveType.STRING)
 			
-			KotlinBuiltIns.isPrimitiveArray(kType)     -> when (KotlinBuiltIns.getPrimitiveArrayType(kType.constructor.declarationDescriptor!!)) {
+			KotlinBuiltIns.isPrimitiveArray(kType)         -> when (KotlinBuiltIns.getPrimitiveArrayType(kType.constructor.declarationDescriptor!!)) {
 				KotlinPrimitiveType.BOOLEAN -> PrimitiveType.BOOLEAN_ARRAY
 				KotlinPrimitiveType.BYTE    -> PrimitiveType.BYTE_ARRAY
 				KotlinPrimitiveType.INT     -> PrimitiveType.INT_ARRAY
@@ -117,7 +118,7 @@ open class KotlinModelLoader<M : Model>(
 				else                        -> throw GeneratorException(kType.toString())
 			}
 			
-			KotlinBuiltIns.isListOrNullableList(kType) -> {
+			KotlinBuiltIns.isListOrNullableList(kType)     -> {
 				if (kType.isMarkedNullable) {
 					throw GeneratorException(kType.toString())
 				}
@@ -130,7 +131,7 @@ open class KotlinModelLoader<M : Model>(
 				model.provideListType(defineType(kElementType))
 			}
 			
-			else                                       -> {
+			else                                           -> {
 				val name = extractName(kType.constructor.declarationDescriptor!!)
 					?: throw GeneratorException(kType.toString())
 				

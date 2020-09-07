@@ -33,6 +33,9 @@ class KotlinWriteCallVisitor(private val names: TypeVisitor<String, Unit>) : Typ
 	}
 	
 	override fun visitNullableType(type: NullableType, data: String): String {
+		if (type.original == PrimitiveType.STRING) {
+			return "writeStringNullable($data)"
+		}
 		return "write($data, ${type.accept(names)})"
 	}
 }

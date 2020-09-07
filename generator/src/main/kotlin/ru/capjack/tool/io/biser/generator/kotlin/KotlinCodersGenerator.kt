@@ -73,6 +73,9 @@ class KotlinCodersGenerator(
 		}
 		
 		override fun visitNullableType(type: NullableType, data: ImportsCollection) {
+			if (type.original == PrimitiveType.STRING) {
+				return
+			}
 			if (deep == 0) {
 				data.addImport(encodersPath)
 				encoders.add(type)
@@ -105,6 +108,9 @@ class KotlinCodersGenerator(
 		}
 		
 		override fun visitNullableType(type: NullableType, data: ImportsCollection) {
+			if (type.original == PrimitiveType.STRING) {
+				return
+			}
 			if (deep == 0) {
 				data.addImport(decodersPath)
 				decoders.add(type)
