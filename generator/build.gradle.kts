@@ -8,7 +8,6 @@ kotlin.target {
 }
 
 dependencies {
-	implementation(kotlin("stdlib-jdk8"))
 	implementation(kotlin("compiler-embeddable"))
 	implementation("org.yaml:snakeyaml:1.25")
 	implementation("org.slf4j:slf4j-api:1.7.26")

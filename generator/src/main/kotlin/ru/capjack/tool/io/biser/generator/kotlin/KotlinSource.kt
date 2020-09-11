@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.config.addKotlinSourceRoot
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -44,7 +45,7 @@ class KotlinSource(dir: Path) {
 			
 			override fun hasErrors() = hasErrors
 			
-			override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageLocation?) {
+			override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
 				val text = if (location == null) message else "${location.path}: (${location.line}, ${location.column}) $message"
 				when {
 					severity.isError                         -> logger.error(text)
