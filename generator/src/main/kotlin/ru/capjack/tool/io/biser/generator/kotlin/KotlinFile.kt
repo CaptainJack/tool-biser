@@ -10,6 +10,12 @@ import java.nio.file.Path
 class KotlinFile(private val name: CodePath) : CodeFile(), ImportsCollection {
 	private val imports = mutableSetOf<CodePath>()
 	
+	private val annotations = mutableListOf<String>()
+	
+	fun addAnnotation(value: String) {
+		annotations.add(value)
+	}
+	
 	override fun addImport(name: String) {
 		addImport(CodePath(name))
 	}
@@ -22,6 +28,10 @@ class KotlinFile(private val name: CodePath) : CodeFile(), ImportsCollection {
 	
 	override fun write(writer: Writer) {
 		prepend(CodeBlock(0).apply {
+			annotations.forEach {
+				line("@file:$it")
+			}
+			
 			val pack = name.parent
 			if (pack != null) {
 				line("package ${pack.value}")

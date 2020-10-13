@@ -17,13 +17,14 @@ class KotlinCodersGenerator(
 	private val targetPackage: CodePath,
 	private val internal: Boolean = false,
 	encodersName: String? = null,
-	decodersName: String? = null
+	decodersName: String? = null,
+	gearFactory: KotlinGearFactory = DefaultKotlinGearFactory()
 ) : CodersGenerator() {
 	
 	private val encodersPath = targetPackage.resolve(encodersName ?: (targetPackage.name.capitalize() + "Encoders"))
 	private val decodersPath = targetPackage.resolve(decodersName ?: (targetPackage.name.capitalize() + "Decoders"))
 	
-	private val typeNameVisitor = KotlinTypeNameVisitor(targetPackage)
+	private val typeNameVisitor = gearFactory.createTypeNameVisitor(targetPackage)
 	
 	private val innerEncoderNameVisitor: TypeVisitor<String, Unit> = KotlinCoderNameVisitor(object : CoderNameScopeVisitor {
 		override fun visitPrimitiveScope(name: String) = "Encoders.$name"
@@ -34,15 +35,15 @@ class KotlinCodersGenerator(
 		override fun visitGeneratedScope(name: String) = name
 	})
 	
-	private val innerWriteCallVisitor: TypeVisitor<String, String> = KotlinWriteCallVisitor(innerEncoderNameVisitor)
-	private val innerReadCallVisitor: TypeVisitor<String, Unit> = KotlinReadCallVisitor(innerDecodeNameVisitor)
+	private val innerWriteCallVisitor: TypeVisitor<String, String> = gearFactory.createWriteCallVisitor(innerEncoderNameVisitor)
+	private val innerReadCallVisitor: TypeVisitor<String, Unit> = gearFactory.createReadCallVisitor(innerDecodeNameVisitor)
 	
-	private val outerWriteCallVisitor: TypeVisitor<String, String> = KotlinWriteCallVisitor(KotlinCoderNameVisitor(object : CoderNameScopeVisitor {
+	private val outerWriteCallVisitor: TypeVisitor<String, String> = gearFactory.createWriteCallVisitor(KotlinCoderNameVisitor(object : CoderNameScopeVisitor {
 		override fun visitPrimitiveScope(name: String) = "Encoders.$name"
 		override fun visitGeneratedScope(name: String) = encodersPath.name + '.' + name
 	}))
 	
-	private val outerReadCallVisitor: TypeVisitor<String, Unit> = KotlinReadCallVisitor(KotlinCoderNameVisitor(object : CoderNameScopeVisitor {
+	private val outerReadCallVisitor: TypeVisitor<String, Unit> = gearFactory.createReadCallVisitor(KotlinCoderNameVisitor(object : CoderNameScopeVisitor {
 		override fun visitPrimitiveScope(name: String) = "Decoders.$name"
 		override fun visitGeneratedScope(name: String) = decodersPath.name + '.' + name
 	}))
@@ -163,6 +164,7 @@ class KotlinCodersGenerator(
 		for (type in aggregator) {
 			type.accept(generator, context)
 		}
+		
 		
 		file.write(sourceDir)
 	}

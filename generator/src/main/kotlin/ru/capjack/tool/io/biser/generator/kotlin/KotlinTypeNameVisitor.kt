@@ -8,7 +8,7 @@ import ru.capjack.tool.io.biser.generator.model.PrimitiveType
 import ru.capjack.tool.io.biser.generator.model.StructureType
 import ru.capjack.tool.io.biser.generator.model.TypeVisitor
 
-class KotlinTypeNameVisitor(private val targetPackage: CodePath) : TypeVisitor<String, ImportsCollection> {
+open class KotlinTypeNameVisitor(protected val targetPackage: CodePath) : TypeVisitor<String, ImportsCollection> {
 	override fun visitPrimitiveType(type: PrimitiveType, data: ImportsCollection): String {
 		return when (type) {
 			PrimitiveType.BOOLEAN       -> "Boolean"

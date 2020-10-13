@@ -15,7 +15,7 @@ kotlin {
 		get("commonMain").dependencies {
 			implementation("ru.capjack.tool:tool-lang:1.5.0")
 			implementation("ru.capjack.tool:tool-io:0.7.0")
-			implementation("ru.capjack.tool:tool-utils:0.14.0")
+			implementation("ru.capjack.tool:tool-utils:0.15.1")
 		}
 		get("commonTest").dependencies {
 			implementation(kotlin("test-common"))

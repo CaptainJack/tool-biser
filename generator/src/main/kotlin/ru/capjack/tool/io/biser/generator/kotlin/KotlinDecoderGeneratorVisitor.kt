@@ -91,6 +91,7 @@ class KotlinDecoderGeneratorVisitor(
 			writeDeclaration(type, data).apply {
 				identBracketsCurly("when (val id = readInt()) ") {
 					descriptor.allChildren.forEach { child ->
+						data.types.add(child)
 						val childDescriptor = child.descriptor
 						val name = child.accept(decoderNames)
 						if (childDescriptor is EntityDescriptor) {
