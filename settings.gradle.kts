@@ -1,4 +1,4 @@
-rootProject.name = "tool-io-biser"
+rootProject.name = "tool-biser"
 
 include(
 	"runtime",

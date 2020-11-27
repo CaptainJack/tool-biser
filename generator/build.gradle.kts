@@ -14,5 +14,5 @@ dependencies {
 	
 	testImplementation(kotlin("test-junit"))
 	testImplementation("ch.qos.logback:logback-classic:1.2.3")
-	testImplementation(project(":tool-io-biser"))
+	testImplementation(project(":tool-biser"))
 }

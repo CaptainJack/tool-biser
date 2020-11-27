@@ -1,8 +1,8 @@
 package example
 
-import ru.capjack.tool.io.biser.Encoder
-import ru.capjack.tool.io.biser.UnknownEntityEncoderException
-import ru.capjack.tool.io.biser.Encoders
+import ru.capjack.tool.biser.Encoder
+import ru.capjack.tool.biser.UnknownEntityEncoderException
+import ru.capjack.tool.biser.Encoders
 
 object ExampleEncoders{
 	val ENUM_EnumStub: Encoder<EnumStub> = {

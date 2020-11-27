@@ -1,8 +1,8 @@
 package example
 
-import ru.capjack.tool.io.biser.Decoder
-import ru.capjack.tool.io.biser.UnknownIdDecoderException
-import ru.capjack.tool.io.biser.Decoders
+import ru.capjack.tool.biser.Decoder
+import ru.capjack.tool.biser.UnknownIdDecoderException
+import ru.capjack.tool.biser.Decoders
 
 object ExampleDecoders{
 	val ENUM_EnumStub: Decoder<EnumStub> = {
