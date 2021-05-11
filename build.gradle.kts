@@ -1,5 +1,5 @@
 plugins {
-	kotlin("multiplatform") version "1.4.32"
+	kotlin("multiplatform") version "1.5.0"
 	id("ru.capjack.publisher") version "0.1.0"
 }
 
@@ -20,21 +20,12 @@ kotlin {
 	
 	sourceSets {
 		get("commonMain").dependencies {
-			implementation("ru.capjack.tool:tool-lang:1.10.0")
-			implementation("ru.capjack.tool:tool-utils:1.5.0")
-			implementation("ru.capjack.tool:tool-io:0.12.0")
+			implementation("ru.capjack.tool:tool-lang:1.11.1")
+			implementation("ru.capjack.tool:tool-utils:1.6.1")
+			implementation("ru.capjack.tool:tool-io:0.13.0")
 		}
 		get("commonTest").dependencies {
-			implementation(kotlin("test-common"))
-			implementation(kotlin("test-annotations-common"))
-		}
-		
-		get("jvmTest").dependencies {
-			implementation(kotlin("test-junit"))
-		}
-		
-		get("jsTest").dependencies {
-			implementation(kotlin("test-js"))
+			implementation(kotlin("test"))
 		}
 	}
 }

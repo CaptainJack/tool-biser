@@ -25,7 +25,7 @@ internal fun String.encodeToUtf8ByteArray(target: ByteArray, offset: Int): Int {
 	var t = offset
 	
 	while (i != l) {
-		var c = this[i++].toInt()
+		var c = this[i++].code
 		if (c < 0x80) {
 			target[t++] = c
 		}
@@ -39,7 +39,7 @@ internal fun String.encodeToUtf8ByteArray(target: ByteArray, offset: Int): Int {
 			target[t++] = 0x80 or (c and 0x3F)
 		}
 		else {
-			c = 0x10000 + ((c and 0x03FF shl 10) or (this[i++].toInt() and 0x03FF))
+			c = 0x10000 + ((c and 0x03FF shl 10) or (this[i++].code and 0x03FF))
 			target[t++] = 0xF0 or (c shr 18)
 			target[t++] = 0x80 or (c shr 12 and 0x3F)
 			target[t++] = 0x80 or (c shr 6 and 0x3F)
