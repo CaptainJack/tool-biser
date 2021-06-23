@@ -52,13 +52,15 @@ abstract class AbstractBiserReader : BiserReader {
 				readToMemory(3)
 				return ((b and 0x01 or 0xFE).shl(24) or i(memory[0]).shl(16) or i(memory[1]).shl(8) or i(memory[2])) - 1
 			}
-			else               -> {
+			b == 0xFE          -> {
 				readToMemory(4)
 				return (i(memory[0]) shl 24)
 					.or(i(memory[1]) shl 16)
 					.or(i(memory[2]) shl 8)
 					.or(i(memory[3]))
 			}
+			else               ->
+				throw BiserReadException("Illegal int value (0x${b.toHexString()})")
 		}
 	}
 	
@@ -92,8 +94,10 @@ abstract class AbstractBiserReader : BiserReader {
 				readToMemory(3)
 				return (((b and 0x01 or 0xFE).shl(24) or i(memory[0]).shl(16) or i(memory[1]).shl(8) or i(memory[2])) - 1).toLong()
 			}
-			else               ->
+			b == 0xFE          ->
 				return readLongRaw()
+			else               ->
+				throw BiserReadException("Illegal long value (0x${b.toHexString()})")
 		}
 	}
 	
