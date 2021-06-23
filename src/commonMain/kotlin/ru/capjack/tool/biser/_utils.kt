@@ -2,6 +2,7 @@ package ru.capjack.tool.biser
 
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.readArray
+import kotlin.jvm.JvmName
 
 inline fun encodeBiser(block: BiserWriter.() -> Unit): ByteArray {
 	val buffer = ArrayByteBuffer()
@@ -14,4 +15,10 @@ inline fun <T> decodeBiser(bytes: ByteArray, block: BiserReader.() -> T): T {
 	val buffer = ArrayByteBuffer(bytes)
 	val reader = ByteBufferBiserReader(buffer)
 	return reader.block()
+}
+
+
+@JvmName("decodeBiserNullable")
+inline fun <T> decodeBiser(bytes: ByteArray?, block: BiserReader.() -> T): T? {
+	return if (bytes == null) null else decodeBiser(bytes, block)
 }
