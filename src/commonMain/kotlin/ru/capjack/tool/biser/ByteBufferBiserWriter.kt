@@ -50,7 +50,13 @@ class ByteBufferBiserWriter(var buffer: OutputByteBuffer) : AbstractBiserWriter(
 				
 				val size = value.encodeToUtf8ByteArray(array, index)
 				
-				val shift = if (size <= 253) 1 else 5
+				val shift = when {
+					size < 128       -> 1
+					size < 16512     -> 2
+					size < 2113664   -> 3
+					size < 471875712 -> 4
+					else             -> 5
+				}
 				array.copyInto(array, index + shift, index, index + size)
 				writeInt(size)
 				
