@@ -1,6 +1,7 @@
 package ru.capjack.tool.biser
 
 import ru.capjack.tool.lang.EMPTY_BOOLEAN_ARRAY
+import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 import ru.capjack.tool.lang.EMPTY_DOUBlE_ARRAY
 import ru.capjack.tool.lang.EMPTY_INT_ARRAY
 import ru.capjack.tool.lang.EMPTY_LONG_ARRAY
@@ -105,6 +106,7 @@ abstract class AbstractBiserReader : BiserReader {
 		return Double.fromBits(readLongRaw())
 	}
 	
+	
 	override fun readBooleanArray(): BooleanArray {
 		return readBooleanArray(readInt())
 	}
@@ -123,6 +125,72 @@ abstract class AbstractBiserReader : BiserReader {
 	
 	override fun readDoubleArray(): DoubleArray {
 		return readDoubleArray(readInt())
+	}
+	
+	
+	override fun readBooleanArray(target: BooleanArray, offset: Int): Int {
+		val size = readInt()
+		if (size == 0)
+			return 0
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		require(target.size >= offset + size)
+		
+		readBooleanArray(target, 0, size)
+		return size
+	}
+	
+	override fun readByteArray(target: ByteArray, offset: Int): Int {
+		val size = readInt()
+		if (size == 0)
+			return 0
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		require(target.size >= offset + size)
+		
+		readByteArray(target, 0, size)
+		return size
+	}
+	
+	override fun readIntArray(target: IntArray, offset: Int): Int {
+		val size = readInt()
+		if (size == 0)
+			return 0
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		require(target.size >= offset + size)
+		
+		readIntArray(target, 0, size)
+		return size
+	}
+	
+	override fun readLongArray(target: LongArray, offset: Int): Int {
+		val size = readInt()
+		if (size == 0)
+			return 0
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		require(target.size >= offset + size)
+		
+		readLongArray(target, 0, size)
+		return size
+	}
+	
+	override fun readDoubleArray(target: DoubleArray, offset: Int): Int {
+		val size = readInt()
+		if (size == 0)
+			return 0
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		require(target.size >= offset + size)
+		
+		readDoubleArray(target, 0, size)
+		return size
 	}
 	
 	@Suppress("UNCHECKED_CAST")
@@ -173,25 +241,22 @@ abstract class AbstractBiserReader : BiserReader {
 	
 	protected abstract fun readToMemory(size: Int)
 	
-	protected abstract fun readByteArray(size: Int): ByteArray
-	
 	private fun readBooleanArray(size: Int): BooleanArray {
 		if (size == 0)
 			return EMPTY_BOOLEAN_ARRAY
 		if (size < 0)
 			throw BiserReadNegativeSizeException(size)
 		
-		var bit = 7
-		var byte = 0
+		return BooleanArray(size).also { readBooleanArray(it, 0, size) }
+	}
+	
+	private fun readByteArray(size: Int): ByteArray {
+		if (size == 0)
+			return EMPTY_BYTE_ARRAY
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
 		
-		return BooleanArray(size) {
-			if (++bit == 8) {
-				bit = 0
-				byte = i(readByte())
-			}
-			val m = 1 shl bit
-			byte and m == m
-		}
+		return ByteArray(size).also { readByteArray(it, 0, size) }
 	}
 	
 	private fun readIntArray(size: Int): IntArray {
@@ -200,7 +265,7 @@ abstract class AbstractBiserReader : BiserReader {
 		if (size < 0)
 			throw BiserReadNegativeSizeException(size)
 		
-		return IntArray(size) { readInt() }
+		return IntArray(size).also { readIntArray(it, 0, size) }
 	}
 	
 	private fun readLongArray(size: Int): LongArray {
@@ -209,7 +274,7 @@ abstract class AbstractBiserReader : BiserReader {
 		if (size < 0)
 			throw BiserReadNegativeSizeException(size)
 		
-		return LongArray(size) { readLong() }
+		return LongArray(size).also { readLongArray(it, 0, size) }
 	}
 	
 	private fun readDoubleArray(size: Int): DoubleArray {
@@ -218,7 +283,41 @@ abstract class AbstractBiserReader : BiserReader {
 		if (size < 0)
 			throw BiserReadNegativeSizeException(size)
 		
-		return DoubleArray(size) { readDouble() }
+		return DoubleArray(size).also { readDoubleArray(it, 0, size) }
+	}
+	
+	protected abstract fun readByteArray(target: ByteArray, offset: Int, size: Int)
+	
+	private fun readBooleanArray(target: BooleanArray, offset: Int, size: Int) {
+		var bit = 7
+		var byte = 0
+		
+		repeat(size) {
+			if (++bit == 8) {
+				bit = 0
+				byte = i(readByte())
+			}
+			val m = 1 shl bit
+			target[offset + it] = byte and m == m
+		}
+	}
+	
+	private fun readIntArray(target: IntArray, offset: Int, size: Int) {
+		repeat(size) {
+			target[offset + it] = readInt()
+		}
+	}
+	
+	private fun readLongArray(target: LongArray, offset: Int, size: Int) {
+		repeat(size) {
+			target[offset + it] = readLong()
+		}
+	}
+	
+	private fun readDoubleArray(target: DoubleArray, offset: Int, size: Int) {
+		repeat(size) {
+			target[offset + it] = readDouble()
+		}
 	}
 	
 	private fun readLongRaw(): Long {

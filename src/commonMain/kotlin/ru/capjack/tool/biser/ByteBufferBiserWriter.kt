@@ -8,28 +8,28 @@ class ByteBufferBiserWriter(var buffer: OutputByteBuffer) : AbstractBiserWriter(
 		buffer.writeByte(value)
 	}
 	
-	override fun writeByteArrayRaw(array: ByteArray, size: Int) {
-		buffer.writeArray(array, 0, size)
+	override fun writeByteArrayRaw(array: ByteArray, offset: Int, size: Int) {
+		buffer.writeArray(array, offset, size)
 	}
 	
-	override fun writeByteArray(value: ByteArray) {
+	override fun writeByteArray(value: ByteArray, offset: Int, size: Int) {
 		buffer.ensureWrite(1 + value.size)
-		super.writeByteArray(value)
+		super.writeByteArray(value, offset, size)
 	}
 	
-	override fun writeIntArray(value: IntArray) {
+	override fun writeIntArray(value: IntArray, offset: Int, size: Int) {
 		buffer.ensureWrite(1 + value.size)
-		super.writeIntArray(value)
+		super.writeIntArray(value, offset, size)
 	}
 	
-	override fun writeLongArray(value: LongArray) {
+	override fun writeLongArray(value: LongArray, offset: Int, size: Int) {
 		buffer.ensureWrite(1 + value.size)
-		super.writeLongArray(value)
+		super.writeLongArray(value, offset, size)
 	}
 	
-	override fun writeDoubleArray(value: DoubleArray) {
+	override fun writeDoubleArray(value: DoubleArray, offset: Int, size: Int) {
 		buffer.ensureWrite(1 + value.size * 8)
-		super.writeDoubleArray(value)
+		super.writeDoubleArray(value, offset, size)
 	}
 	
 	override fun writeString(value: String) {

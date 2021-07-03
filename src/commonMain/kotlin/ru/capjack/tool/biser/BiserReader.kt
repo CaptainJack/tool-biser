@@ -23,6 +23,17 @@ interface BiserReader {
 	fun readDoubleArray(): DoubleArray
 	
 	
+	fun readBooleanArray(target: BooleanArray, offset: Int = 0): Int
+	
+	fun readByteArray(target: ByteArray, offset: Int = 0): Int
+	
+	fun readIntArray(target: IntArray, offset: Int = 0): Int
+	
+	fun readLongArray(target: LongArray, offset: Int = 0): Int
+	
+	fun readDoubleArray(target: DoubleArray, offset: Int = 0): Int
+	
+	
 	fun readString(): String
 	
 	fun readStringNullable(): String?

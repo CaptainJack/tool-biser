@@ -12,15 +12,15 @@ interface BiserWriter {
 	fun writeDouble(value: Double)
 	
 	
-	fun writeBooleanArray(value: BooleanArray)
+	fun writeBooleanArray(value: BooleanArray, offset: Int = 0, size: Int = value.size)
 	
-	fun writeByteArray(value: ByteArray)
+	fun writeByteArray(value: ByteArray, offset: Int = 0, size: Int = value.size)
 	
-	fun writeIntArray(value: IntArray)
+	fun writeIntArray(value: IntArray, offset: Int = 0, size: Int = value.size)
 	
-	fun writeLongArray(value: LongArray)
+	fun writeLongArray(value: LongArray, offset: Int = 0, size: Int = value.size)
 	
-	fun writeDoubleArray(value: DoubleArray)
+	fun writeDoubleArray(value: DoubleArray, offset: Int = 0, size: Int = value.size)
 	
 	
 	fun writeString(value: String)

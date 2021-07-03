@@ -112,21 +112,24 @@ abstract class AbstractBiserWriter : BiserWriter {
 	}
 	
 	@Suppress("DuplicatedCode")
-	override fun writeBooleanArray(value: BooleanArray) {
-		var size = value.size
-		writeInt(size)
-		if (size != 0) {
-			size /= 8
+	override fun writeBooleanArray(value: BooleanArray, offset: Int, size: Int) {
+		require(size >= 0 && value.size >= offset + size)
+		
+		var s = size
+		writeInt(s)
+		if (s != 0) {
+			s /= 8
 			if (value.size % 8 != 0) {
-				size += 1
+				s += 1
 			}
 			
-			val bytes = if (size <= memory.size) memory else ByteArray(size)
+			val bytes = if (s <= memory.size) memory else ByteArray(s)
 			var byte = 0
 			var bit = 0
 			var i = 0
 			
-			for (v in value) {
+			repeat(size) {
+				val v = value[offset + it]
 				if (v) {
 					byte = byte or (1 shl bit)
 				}
@@ -141,32 +144,43 @@ abstract class AbstractBiserWriter : BiserWriter {
 				bytes[i] = byte
 			}
 			
-			writeByteArrayRaw(bytes, size)
+			writeByteArrayRaw(bytes, s)
 		}
 	}
 	
-	override fun writeByteArray(value: ByteArray) {
-		writeInt(value.size)
-		writeByteArrayRaw(value, value.size)
+	override fun writeByteArray(value: ByteArray, offset: Int, size: Int) {
+		require(size >= 0 && value.size >= offset + size)
+		
+		writeInt(size)
+		writeByteArrayRaw(value, offset, size)
 	}
 	
-	override fun writeIntArray(value: IntArray) {
+	override fun writeIntArray(value: IntArray, offset: Int, size: Int) {
+		require(size >= 0 && value.size >= offset + size)
+		
 		writeInt(value.size)
-		value.forEach(::writeInt)
+		repeat(size) {
+			writeInt(value[offset + it])
+		}
 	}
 	
-	override fun writeLongArray(value: LongArray) {
+	override fun writeLongArray(value: LongArray, offset: Int, size: Int) {
+		require(size >= 0 && value.size >= offset + size)
+		
 		writeInt(value.size)
-		value.forEach(::writeLong)
+		repeat(size) {
+			writeLong(value[offset + it])
+		}
 	}
 	
-	override fun writeDoubleArray(value: DoubleArray) {
-		val size = value.size
+	override fun writeDoubleArray(value: DoubleArray, offset: Int, size: Int) {
+		require(size >= 0 && value.size >= offset + size)
+		
 		writeInt(size)
 		
 		if (size != 0) {
 			val arr = ByteArray(size * 8)
-			var s = 0
+			var s = offset
 			var b = 0
 			while (s < size) {
 				val v = value[s++].toRawBits()
@@ -243,5 +257,9 @@ abstract class AbstractBiserWriter : BiserWriter {
 		encoder(value)
 	}
 	
-	protected abstract fun writeByteArrayRaw(array: ByteArray, size: Int)
+	private fun writeByteArrayRaw(array: ByteArray, size: Int) {
+		writeByteArrayRaw(array, 0, size)
+	}
+	
+	protected abstract fun writeByteArrayRaw(array: ByteArray, offset: Int, size: Int)
 }

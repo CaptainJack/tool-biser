@@ -2,20 +2,14 @@ package ru.capjack.tool.biser
 
 import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.readArray
-import ru.capjack.tool.lang.EMPTY_BYTE_ARRAY
 
 class ByteBufferBiserReader(var buffer: InputByteBuffer) : AbstractBiserReader() {
 	override fun readByte(): Byte {
 		return buffer.readByte()
 	}
 	
-	override fun readByteArray(size: Int): ByteArray {
-		if (size == 0)
-			return EMPTY_BYTE_ARRAY
-		if (size < 0)
-			throw BiserReadNegativeSizeException(size)
-		
-		return buffer.readArray(size)
+	override fun readByteArray(target: ByteArray, offset: Int, size: Int) {
+		return buffer.readToArray(target, offset, size)
 	}
 	
 	override fun readString(): String {
