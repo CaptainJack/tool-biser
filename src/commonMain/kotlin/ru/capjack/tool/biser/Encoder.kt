@@ -9,11 +9,11 @@ object Encoders {
 	val LONG: Encoder<Long> = BiserWriter::writeLong
 	val DOUBLE: Encoder<Double> = BiserWriter::writeDouble
 	
-	val BOOLEAN_ARRAY: Encoder<BooleanArray> = BiserWriter::writeBooleanArray
-	val BYTE_ARRAY: Encoder<ByteArray> = BiserWriter::writeByteArray
-	val INT_ARRAY: Encoder<IntArray> = BiserWriter::writeIntArray
-	val LONG_ARRAY: Encoder<LongArray> = BiserWriter::writeLongArray
-	val DOUBLE_ARRAY: Encoder<DoubleArray> = BiserWriter::writeDoubleArray
+	val BOOLEAN_ARRAY: Encoder<BooleanArray> = { writeBooleanArray(it) }
+	val BYTE_ARRAY: Encoder<ByteArray> = { writeByteArray(it) }
+	val INT_ARRAY: Encoder<IntArray> = { writeIntArray(it) }
+	val LONG_ARRAY: Encoder<LongArray> = { writeLongArray(it) }
+	val DOUBLE_ARRAY: Encoder<DoubleArray> = { writeDoubleArray(it) }
 	
 	val STRING: Encoder<String> = BiserWriter::writeString
 	val STRING_NULLABLE: Encoder<String?> = BiserWriter::writeStringNullable
