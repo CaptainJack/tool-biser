@@ -29,6 +29,8 @@ interface BiserWriter {
 	
 	fun <E> writeList(value: Collection<E>, encoder: Encoder<E>)
 	
+	fun <E> writeList(value: Array<E>, encoder: Encoder<E>)
+	
 	fun <K, V> writeMap(value: Map<K, V>, keyEncoder: Encoder<K>, valueEncoder: Encoder<V>)
 	
 	fun <T> write(value: T, encoder: Encoder<T>)

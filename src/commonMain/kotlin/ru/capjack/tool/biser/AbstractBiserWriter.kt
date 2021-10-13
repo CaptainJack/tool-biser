@@ -210,6 +210,11 @@ abstract class AbstractBiserWriter : BiserWriter {
 		}
 	}
 	
+	override fun <E> writeList(value: Array<E>, encoder: Encoder<E>) {
+		writeInt(value.size)
+		value.forEach { encoder(this, it) }
+	}
+	
 	override fun <K, V> writeMap(value: Map<K, V>, keyEncoder: Encoder<K>, valueEncoder: Encoder<V>) {
 		writeInt(value.size)
 		
