@@ -214,7 +214,30 @@ abstract class AbstractBiserReader : BiserReader {
 		if (size < 0)
 			throw BiserReadNegativeSizeException(size)
 		
-		return List(size) { decoder(this) }
+		return List(size) { decoder() }
+	}
+	
+	@Suppress("UNCHECKED_CAST")
+	override fun <E> readList(target: MutableCollection<E>, decoder: Decoder<E>): Int {
+		val size = readInt()
+		
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		if (size > 0) {
+			if (decoder === Decoders.BOOLEAN) {
+				for (b in readBooleanArray(size)) {
+					target.add(b as E)
+				}
+			}
+			else {
+				repeat(size) {
+					target.add(decoder())
+				}
+			}
+		}
+		
+		return size
 	}
 	
 	override fun <K, V> readMap(keyDecoder: Decoder<K>, valueDecoder: Decoder<V>): Map<K, V> {
@@ -233,6 +256,21 @@ abstract class AbstractBiserReader : BiserReader {
 		}
 		
 		return map
+	}
+	
+	override fun <K, V> readMap(keyDecoder: Decoder<K>, valueDecoder: Decoder<V>, target: MutableMap<K, V>): Int {
+		val size = readInt()
+		
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		if (size > 0) {
+			repeat(size) {
+				target[keyDecoder()] = valueDecoder()
+			}
+		}
+		
+		return size
 	}
 	
 	override fun <E> read(decoder: Decoder<E>): E {
