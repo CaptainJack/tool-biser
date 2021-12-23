@@ -48,5 +48,5 @@ interface BiserReader {
 	
 	fun <E> read(decoder: Decoder<E>): E
 	
-	fun readIterate(decoder: Decoder<Unit>): Int
+	fun readIterate(decoder: (index: Int) -> Unit): Int
 }

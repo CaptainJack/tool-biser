@@ -277,16 +277,14 @@ abstract class AbstractBiserReader : BiserReader {
 		return decoder(this)
 	}
 	
-	override fun readIterate(decoder: Decoder<Unit>): Int {
+	override fun readIterate(decoder: (index: Int) -> Unit): Int {
 		val size = readInt()
 		
 		if (size < 0)
 			throw BiserReadNegativeSizeException(size)
 		
 		if (size > 0) {
-			repeat(size) {
-				decoder()
-			}
+			repeat(size, decoder)
 		}
 		
 		return size
