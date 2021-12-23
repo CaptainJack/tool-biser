@@ -258,7 +258,7 @@ abstract class AbstractBiserReader : BiserReader {
 		return map
 	}
 	
-	override fun <K, V> readMap(keyDecoder: Decoder<K>, valueDecoder: Decoder<V>, target: MutableMap<K, V>): Int {
+	override fun <K, V> readMap(target: MutableMap<K, V>, keyDecoder: Decoder<K>, valueDecoder: Decoder<V>): Int {
 		val size = readInt()
 		
 		if (size < 0)
@@ -275,6 +275,21 @@ abstract class AbstractBiserReader : BiserReader {
 	
 	override fun <E> read(decoder: Decoder<E>): E {
 		return decoder(this)
+	}
+	
+	override fun readIterate(decoder: Decoder<Unit>): Int {
+		val size = readInt()
+		
+		if (size < 0)
+			throw BiserReadNegativeSizeException(size)
+		
+		if (size > 0) {
+			repeat(size) {
+				decoder()
+			}
+		}
+		
+		return size
 	}
 	
 	protected abstract fun readToMemory(size: Int)
