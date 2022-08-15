@@ -1,4 +1,5 @@
-.gradle
-.idea
-build
-tmp
+.gradle/
+.idea/
+build/
+tmp/
+kotlin-js-store/
