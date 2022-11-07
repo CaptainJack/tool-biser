@@ -2,8 +2,9 @@ package ru.capjack.tool.biser
 
 import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.readArray
+import kotlin.jvm.Volatile
 
-class ByteBufferBiserReader(var buffer: InputByteBuffer) : AbstractBiserReader() {
+class ByteBufferBiserReader(@Volatile var buffer: InputByteBuffer) : AbstractBiserReader() {
 	override fun readByte(): Byte {
 		return buffer.readByte()
 	}

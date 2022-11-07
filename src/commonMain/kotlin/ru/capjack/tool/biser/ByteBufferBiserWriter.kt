@@ -1,8 +1,9 @@
 package ru.capjack.tool.biser
 
 import ru.capjack.tool.io.OutputByteBuffer
+import kotlin.jvm.Volatile
 
-class ByteBufferBiserWriter(var buffer: OutputByteBuffer) : AbstractBiserWriter() {
+class ByteBufferBiserWriter(@Volatile var buffer: OutputByteBuffer) : AbstractBiserWriter() {
 	
 	override fun writeByte(value: Byte) {
 		buffer.writeByte(value)

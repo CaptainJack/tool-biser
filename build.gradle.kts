@@ -1,5 +1,5 @@
 plugins {
-	kotlin("multiplatform") version "1.7.10"
+	kotlin("multiplatform") version "1.7.20"
 	id("ru.capjack.publisher") version "1.0.0"
 }
 
@@ -22,7 +22,7 @@ kotlin {
 		get("commonMain").dependencies {
 			implementation("ru.capjack.tool:tool-lang:1.13.1")
 			implementation("ru.capjack.tool:tool-utils:1.9.0")
-			implementation("ru.capjack.tool:tool-io:1.2.0")
+			implementation("ru.capjack.tool:tool-io:1.2.1")
 		}
 		get("commonTest").dependencies {
 			implementation(kotlin("test"))
